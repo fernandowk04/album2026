@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Troca de Figurinhas — Copa 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#F0F4F8;min-height:100vh;padding-bottom:40px}
+.app{max-width:640px;margin:0 auto;padding:1rem}
+.banner{background:#0D1B4B;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:center;gap:12px}
+.banner-icon{font-size:30px}
+.banner-title{color:#FFB300;font-size:15px;font-weight:700}
+.banner-sub{color:rgba(255,255,255,0.6);font-size:12px;margin-top:2px}
+.card{background:#fff;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.07)}
+.card h3{font-size:14px;font-weight:700;color:#0D1B4B;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.tip{font-size:12px;color:#90A4AE;margin-bottom:12px;line-height:1.5}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.field label{font-size:11px;color:#90A4AE;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.field select,.field input{font-size:13px;padding:8px 10px;border:1px solid #E0E0E0;border-radius:8px;background:#F9FAFB;color:#1A1A2E;width:100%}
+.field select:focus,.field input:focus{border-color:#1565C0;outline:none;background:#fff}
+.btn{padding:9px 18px;font-size:13px;border-radius:8px;border:none;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:6px}
+.btn.primary{background:#0D1B4B;color:#fff;width:100%;justify-content:center}
+.btn.primary:hover{background:#1565C0}
+.btn.gold{background:#FFB300;color:#0D1B4B;width:100%;justify-content:center;margin-top:8px}
+.btn.gold:hover{background:#FFA000}
+.btn.green{background:#2E7D32;color:#fff;width:100%;justify-content:center;margin-top:8px}
+.btn.sm{font-size:11px;padding:4px 10px;background:#E3F2FD;color:#0D1B4B;border:none;border-radius:6px;cursor:pointer;margin:2px}
+.btn.sm:hover{background:#1565C0;color:#fff}
+.btn.sm.sel{background:#0D1B4B;color:#FFB300}
+.section-title{font-size:12px;font-weight:700;color:#0D1B4B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.chip-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
+.chip{display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:.15s}
+.chip.avail{background:#E8F5E9;color:#1B5E20;border-color:#A5D6A7}
+.chip.avail:hover{background:#2E7D32;color:#fff}
+.chip.avail.sel{background:#2E7D32;color:#fff;border-color:#1B5E20}
+.chip.want{background:#E3F2FD;color:#0D277B;border-color:#90CAF9}
+.chip.want:hover{background:#1565C0;color:#fff}
+.chip.want.sel{background:#1565C0;color:#fff;border-color:#0D47A1}
+.result-box{background:#F0FFF4;border:1.5px solid #A5D6A7;border-radius:10px;padding:1rem;margin-top:12px}
+.result-box.none{background:#FFF3E0;border-color:#FFCC80}
+.result-title{font-size:13px;font-weight:700;color:#1B5E20;margin-bottom:8px}
+.result-title.none{color:#E65100}
+.match-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #C8E6C9;font-size:13px}
+.match-row:last-child{border-bottom:none}
+.match-give{color:#D32F2F;font-weight:600}
+.match-get{color:#2E7D32;font-weight:600}
+.arrow{color:#90A4AE;font-size:16px}
+.wpp-box{background:#E8F5E9;border:1.5px solid #A5D6A7;border-radius:10px;padding:1rem;margin-top:10px;font-size:12px;color:#1B5E20;line-height:1.7;white-space:pre-wrap;font-family:monospace}
+.grp-badge{display:inline-block;background:#0D1B4B;color:#FFB300;border-radius:6px;padding:1px 7px;font-size:10px;font-weight:700;margin-right:4px}
+.step{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+.step-num{background:#FFB300;color:#0D1B4B;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;margin-top:1px}
+.step-txt{font-size:13px;color:#333;line-height:1.5}
+.hidden{display:none}
+.dup-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:12px}
+.dup-card{background:#F0F4F8;border-radius:8px;padding:6px 10px;font-size:11px}
+.dup-card-team{font-weight:700;color:#0D1B4B;font-size:12px}
+.dup-card-nums{color:#607D8B;margin-top:2px}
+.progress-indicator{text-align:center;padding:1rem;color:#90A4AE;font-size:13px}
+@media(max-width:480px){.dup-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="banner">
+    <div class="banner-icon">⚽</div>
+    <div>
+      <div class="banner-title">Troca de Figurinhas · Copa 2026</div>
+      <div class="banner-sub">Gabriel &amp; Bernardo · Panini FIFA World Cup 2026</div>
+    </div>
+  </div>
+
+  <!-- PASSO 1: O QUE EU (GABRIEL/BERNARDO) TENHO PARA DAR -->
+  <div class="card">
+    <h3>🔄 O que temos para trocar</h3>
+    <p class="tip">Essas são nossas figurinhas repetidas disponíveis para troca. Veja se tem alguma que você precisa!</p>
+    <div id="dup-grid" class="dup-grid"></div>
+  </div>
+
+  <!-- PASSO 2: O QUE O AMIGO TEM PARA DAR -->
+  <div class="card">
+    <h3>✋ O que você tem para me dar?</h3>
+    <p class="tip">Selecione os times abaixo e marque os números que você tem repetidos. Vou verificar se preciso de algum!</p>
+
+    <div class="field">
+      <label>Selecione o time</label>
+      <select id="sel-team" onchange="loadTeamNums()">
+        <option value="">— escolha um time —</option>
+      </select>
+    </div>
+
+    <div id="num-wrap" class="hidden">
+      <div class="section-title" id="num-label">Marque os números que você tem:</div>
+      <div id="num-chips" class="chip-wrap"></div>
+      <button class="btn primary" onclick="addSelected()" style="margin-top:4px">✅ Adicionar figurinhas</button>
+    </div>
+
+    <div id="added-wrap" class="hidden" style="margin-top:14px">
+      <div class="section-title">Figurinhas que você selecionou:</div>
+      <div id="added-chips" class="chip-wrap"></div>
+      <button class="btn" style="background:#FFCDD2;color:#B71C1C;width:auto;padding:6px 14px;margin-top:4px;font-size:12px" onclick="clearAdded()">🗑 Limpar tudo</button>
+    </div>
+  </div>
+
+  <!-- PASSO 3: RESULTADO -->
+  <div class="card hidden" id="result-card">
+    <h3>🎯 Trocas possíveis</h3>
+    <div id="result-content"></div>
+    <div id="wpp-wrap" class="hidden">
+      <div class="wpp-box" id="wpp-msg"></div>
+      <button class="btn green" onclick="sendWpp()">📲 Enviar proposta pelo WhatsApp</button>
+    </div>
+  </div>
+
+  <!-- COMO FUNCIONA -->
+  <div class="card">
+    <h3>ℹ️ Como funciona</h3>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-txt">Veja nossas figurinhas repetidas disponíveis para troca acima.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-txt">Selecione os times e números das figurinhas que você tem repetidas para nos dar.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-txt">O app cruza automaticamente e mostra quais trocas são possíveis.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-txt">Manda a proposta pelo WhatsApp e a gente combina a troca! 🤝</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── DADOS: duplicatas que Gabriel e Bernardo têm ──────────────────────────
+const MINHAS_DUPLICATAS = [
+  {grp:'A',team:'MEX',num:12},{grp:'A',team:'RSA',num:4},{grp:'A',team:'RSA',num:4},{grp:'A',team:'RSA',num:16},
+  {grp:'B',team:'BRA',num:6},{grp:'B',team:'CAN',num:1},{grp:'B',team:'CAN',num:7},{grp:'B',team:'CAN',num:11},
+  {grp:'B',team:'QAT',num:10},{grp:'B',team:'QAT',num:10},{grp:'B',team:'QAT',num:14},{grp:'B',team:'QAT',num:15},{grp:'B',team:'SUI',num:12},
+  {grp:'C',team:'BRA',num:9},{grp:'C',team:'MAR',num:10},{grp:'C',team:'SCO',num:3},{grp:'C',team:'SCO',num:3},{grp:'C',team:'SCO',num:4},{grp:'C',team:'SCO',num:7},
+  {grp:'D',team:'AUS',num:1},{grp:'D',team:'AUS',num:12},{grp:'D',team:'AUS',num:14},{grp:'D',team:'AUS',num:17},
+  {grp:'E',team:'CIV',num:6},{grp:'E',team:'CIV',num:11},{grp:'E',team:'CIV',num:14},{grp:'E',team:'CUW',num:1},{grp:'E',team:'CUW',num:6},{grp:'E',team:'CUW',num:9},
+  {grp:'E',team:'KOR',num:4},{grp:'E',team:'KOR',num:6},{grp:'E',team:'KOR',num:10},
+  {grp:'F',team:'NED',num:1},{grp:'F',team:'NED',num:17},{grp:'F',team:'NED',num:19},
+  {grp:'G',team:'EGY',num:2},{grp:'G',team:'EGY',num:6},{grp:'G',team:'IRN',num:8},{grp:'G',team:'NZL',num:10},
+  {grp:'H',team:'ESP',num:2},{grp:'H',team:'ESP',num:6},{grp:'H',team:'KSA',num:7},{grp:'H',team:'KSA',num:12},{grp:'H',team:'KSA',num:17},
+  {grp:'I',team:'FRA',num:7},{grp:'I',team:'FRA',num:20},{grp:'I',team:'JPN',num:6},{grp:'I',team:'JPN',num:8},{grp:'I',team:'JPN',num:8},{grp:'I',team:'JPN',num:12},
+  {grp:'I',team:'NOR',num:2},{grp:'I',team:'NOR',num:4},{grp:'I',team:'NOR',num:8},{grp:'I',team:'NOR',num:10},{grp:'I',team:'NOR',num:12},
+  {grp:'I',team:'SEN',num:6},{grp:'I',team:'SEN',num:16},{grp:'I',team:'SEN',num:20},
+  {grp:'J',team:'ALG',num:7},{grp:'J',team:'ALG',num:11},{grp:'J',team:'ALG',num:20},{grp:'J',team:'ARG',num:9},{grp:'J',team:'JOR',num:1},{grp:'J',team:'JOR',num:2},
+  {grp:'K',team:'COL',num:3},{grp:'K',team:'COL',num:20},{grp:'K',team:'POR',num:12},
+  {grp:'L',team:'CRO',num:1},{grp:'L',team:'GHA',num:7},{grp:'L',team:'GHA',num:17},{grp:'L',team:'PAN',num:8},{grp:'L',team:'PAN',num:12},
+];
+
+// ── DADOS: figurinhas que ainda faltam para Gabriel e Bernardo ────────────
+const MINHAS_FALTANTES = {
+  A:{MEX:[1,3,5,8,9,13,20],RSA:[1,7,9,11,13,14,15,17,18],KOR:[14,17,18,19],CZE:[6,9,12,13,14,16,18,19,20]},
+  B:{CAN:[4,9,10,15,17,18,19],BIH:[3,4,7,8,11,13,16,17,19,20],QAT:[1,5,8,11,13,16,17,20],SUI:[4,6,10,15,17,18,19,20]},
+  C:{BRA:[1,3,8,11,20],MAR:[1,5,8,9,12,16,18,20],HAI:[1,4,7,8,11,12,13,14,16],SCO:[1,18,20]},
+  D:{USA:[1,6,10,13,17,18,19,20],PAR:[7,11,16,17,19,20],AUS:[3,6,19,20],TUR:[2,4,5,6,7,8,9,11,12,13]},
+  E:{GER:[1,3,4,8,11,15,16,20],CUW:[3,4,7,8,11,15,16,20],CIV:[1,2,3,4,5,7,9,12,13,17,20],ECU:[1,5,6,7,9,13,15,18,19]},
+  F:{NED:[2,3,6,7,8,11,20],JPN:[1,5,9,10,18],SWE:[7,8,10,12,16,17,20],TUN:[3,4,5,6,8,12,17,20]},
+  G:{BEL:[1,2,5,6,9,12,13,18],EGY:[3,4,7,8,13,15,16,18,20],IRN:[2,4,6,7,9,10,11,14,15,16,18,19],NZL:[4,7,8,11,15,16,17]},
+  H:{ESP:[3,12,15,17,20],CPV:[3,7,10,11,15,16,20],KSA:[2,4,6,10,11,16],URU:[3,4,5,10,12,13,19]},
+  I:{FRA:[2,5,8,9,12,19],SEN:[1,7,11,12,17],IRQ:[1,2,5,6,8,9,10,15,18,19],NOR:[1,3,5,20]},
+  J:{ARG:[1,3,4,17],ALG:[3,5,9,10,14,15,18],AUT:[1,4,5,7,8,11,12,14,16,17,20],JOR:[3,4,5,7,8,9,11,12,14,16,17,18,19,20]},
+  K:{POR:[2,4,5,11,15,16,19],COD:[2,4,5,6,7,9,13,14,18],UZB:[1,2,3,8,12,18],COL:[1,2,6,8,9,13,15]},
+  L:{ENG:[15,18],CRO:[2,3,5,6,7,9,15,19],GHA:[8,13,19],PAN:[5,13,15,19,20]},
+  ESP:{FWC:[1,4,6,10,14,17,18,19],'COCA-COLA':[1,4,5,8,9,10,11,13,14]}
+};
+
+const NAMES={
+  MEX:'México',RSA:'África do Sul',KOR:'Coreia do Sul',CZE:'Rep. Checa',
+  CAN:'Canadá',BIH:'Bósnia',QAT:'Catar',SUI:'Suíça',
+  BRA:'Brasil',MAR:'Marrocos',HAI:'Haiti',SCO:'Escócia',
+  USA:'EUA',PAR:'Paraguai',AUS:'Austrália',TUR:'Turquia',
+  GER:'Alemanha',CUW:'Curaçao',CIV:'Costa do Marfim',ECU:'Equador',
+  NED:'Holanda',JPN:'Japão',SWE:'Suécia',TUN:'Tunísia',
+  BEL:'Bélgica',EGY:'Egito',IRN:'Irã',NZL:'Nova Zelândia',
+  ESP:'Espanha',CPV:'Cabo Verde',KSA:'Arábia Saudita',URU:'Uruguai',
+  FRA:'França',SEN:'Senegal',IRQ:'Iraque',NOR:'Noruega',
+  ARG:'Argentina',ALG:'Argélia',AUT:'Áustria',JOR:'Jordânia',
+  POR:'Portugal',COD:'Congo',UZB:'Uzbequistão',COL:'Colômbia',
+  ENG:'Inglaterra',CRO:'Croácia',GHA:'Gana',PAN:'Panamá',
+  FWC:'FWC Especiais','COCA-COLA':'Coca-Cola'
+};
+
+// Estado do amigo
+let amigoTem = []; // [{grp,team,num}]
+let selectedNums = new Set();
+
+// ── Renderizar duplicatas ─────────────────────────────────────────────────
+function renderDups(){
+  const byTeam = {};
+  MINHAS_DUPLICATAS.forEach(d=>{
+    const k=`${d.grp}|${d.team}`;
+    if(!byTeam[k]) byTeam[k]={grp:d.grp,team:d.team,nums:[]};
+    byTeam[k].nums.push(d.num);
+  });
+  const grid = document.getElementById('dup-grid');
+  grid.innerHTML = Object.values(byTeam).map(({grp,team,nums})=>{
+    const cnt = {};
+    nums.forEach(n=>cnt[n]=(cnt[n]||0)+1);
+    const numsStr = [...new Set(nums)].sort((a,b)=>a-b)
+      .map(n=>cnt[n]>1?`${n}(x${cnt[n]})`:n).join(', ');
+    return `<div class="dup-card">
+      <div class="dup-card-team"><span style="color:#607D8B;font-size:10px">G.${grp}</span> ${team}</div>
+      <div class="dup-card-nums">${numsStr}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Build team select ─────────────────────────────────────────────────────
+function buildSelect(){
+  const sel = document.getElementById('sel-team');
+  const teams = [];
+  Object.entries(MINHAS_FALTANTES).forEach(([grp,tms])=>{
+    Object.keys(tms).forEach(team=>teams.push({grp,team}));
+  });
+  teams.sort((a,b)=>a.team.localeCompare(b.team));
+  sel.innerHTML = '<option value="">— escolha um time —</option>' +
+    teams.map(({grp,team})=>`<option value="${grp}|${team}">G.${grp} · ${team} — ${NAMES[team]||team}</option>`).join('');
+}
+
+function loadTeamNums(){
+  const val = document.getElementById('sel-team').value;
+  const wrap = document.getElementById('num-wrap');
+  if(!val){wrap.classList.add('hidden');return;}
+  const [grp,team] = val.split('|');
+  selectedNums = new Set();
+  document.getElementById('num-label').textContent = `Marque os números de ${team} que você tem repetidos:`;
+  // Show 1-20
+  const chips = document.getElementById('num-chips');
+  chips.innerHTML = Array.from({length:20},(_,i)=>i+1).map(n=>
+    `<button class="btn sm" id="chip-${n}" onclick="toggleNum(${n})">${n}</button>`
+  ).join('');
+  wrap.classList.remove('hidden');
+}
+
+function toggleNum(n){
+  const btn = document.getElementById(`chip-${n}`);
+  if(selectedNums.has(n)){selectedNums.delete(n);btn.classList.remove('sel');}
+  else{selectedNums.add(n);btn.classList.add('sel');}
+}
+
+function addSelected(){
+  if(!selectedNums.size){alert('Selecione ao menos um número!');return;}
+  const val = document.getElementById('sel-team').value;
+  const [grp,team] = val.split('|');
+  selectedNums.forEach(num=>amigoTem.push({grp,team,num}));
+  selectedNums = new Set();
+  document.getElementById('sel-team').value='';
+  document.getElementById('num-wrap').classList.add('hidden');
+  renderAdded();
+  calcMatches();
+}
+
+function renderAdded(){
+  const wrap = document.getElementById('added-wrap');
+  const chips = document.getElementById('added-chips');
+  if(!amigoTem.length){wrap.classList.add('hidden');return;}
+  wrap.classList.remove('hidden');
+  // group by team
+  const byTeam={};
+  amigoTem.forEach(d=>{
+    const k=`${d.grp}|${d.team}`;
+    if(!byTeam[k])byTeam[k]={grp:d.grp,team:d.team,nums:[]};
+    byTeam[k].nums.push(d.num);
+  });
+  chips.innerHTML = Object.values(byTeam).map(({grp,team,nums})=>
+    `<span class="chip want sel">G.${grp} ${team}: ${[...new Set(nums)].sort((a,b)=>a-b).join(', ')}</span>`
+  ).join('');
+}
+
+function clearAdded(){
+  amigoTem=[];
+  renderAdded();
+  document.getElementById('result-card').classList.add('hidden');
+}
+
+// ── CÁLCULO DE MATCHES ───────────────────────────────────────────────────
+function calcMatches(){
+  const card = document.getElementById('result-card');
+  const content = document.getElementById('result-content');
+  const wppWrap = document.getElementById('wpp-wrap');
+
+  if(!amigoTem.length){card.classList.add('hidden');return;}
+  card.classList.remove('hidden');
+
+  // O que o amigo pode ME DAR (que está nas minhas faltantes)
+  const euRecebo = amigoTem.filter(({grp,team,num})=>{
+    return MINHAS_FALTANTES[grp]?.[team]?.includes(num);
+  });
+
+  // O que EU posso DAR ao amigo (minhas duplicatas — uma por uma disponível)
+  // Para cada figurinha que eu vou receber, preciso oferecer uma em troca
+  // Mostrar lista de minhas dups disponíveis para ele escolher
+  const dupDisp = {};
+  MINHAS_DUPLICATAS.forEach(d=>{
+    const k=`${d.grp}|${d.team}|${d.num}`;
+    dupDisp[k]=(dupDisp[k]||0)+1;
+  });
+
+  if(!euRecebo.length){
+    content.innerHTML = `<div class="result-box none">
+      <div class="result-title none">😕 Nenhuma troca possível por enquanto</div>
+      <p style="font-size:12px;color:#607D8B;margin-top:6px">
+        As figurinhas que você selecionou já temos no álbum ou não estão na nossa lista de faltantes.<br><br>
+        Tente selecionar outros times e números!
+      </p>
+    </div>`;
+    wppWrap.classList.add('hidden');
+    return;
+  }
+
+  // Monta proposta de troca equilibrada
+  // Para cada fig que eu recebo, sugiro uma minha dup em troca
+  const dupKeys = Object.keys(dupDisp);
+  const propostas = euRecebo.map((fig,i)=>{
+    // pegar uma dup disponível para dar
+    const chave = dupKeys.find(k=>dupDisp[k]>0);
+    if(chave) dupDisp[chave]--;
+    const [dg,dt,dn] = chave ? chave.split('|') : ['?','?','?'];
+    return {
+      euRecebo: fig,
+      euDou: chave ? {grp:dg,team:dt,num:parseInt(dn)} : null
+    };
+  });
+
+  let html = `<div class="result-box">
+    <div class="result-title">🎉 ${euRecebo.length} troca(s) possível(is)!</div>`;
+
+  propostas.forEach(({euRecebo:r, euDou:d})=>{
+    html += `<div class="match-row">
+      <span>Você me dá: <span class="match-get">G.${r.grp} ${r.team} #${r.num}</span></span>
+      <span class="arrow">⇄</span>
+      <span>Eu te dou: <span class="match-give">${d ? `G.${d.grp} ${d.team} #${d.num}` : '(combinar)'}</span></span>
+    </div>`;
+  });
+  html += `</div>`;
+  content.innerHTML = html;
+
+  // Montar mensagem WhatsApp
+  const linhas = propostas.map(({euRecebo:r,euDou:d})=>
+    `  • Você me dá: ${r.team} #${r.num} ↔ Eu te dou: ${d?`${d.team} #${d.num}`:'(combinar)'}`
+  ).join('\n');
+
+  const msg = `Oi! Vi suas figurinhas no app de trocas do Gabriel & Bernardo 👋
+
+Tenho interesse em trocar:
+${linhas}
+
+Topas? Me manda mensagem pra combinarmos! ⚽🏆
+
+_Álbum FIFA World Cup 2026 - Panini_`;
+
+  document.getElementById('wpp-msg').textContent = msg;
+  wppWrap.classList.remove('hidden');
+}
+
+function sendWpp(){
+  const msg = document.getElementById('wpp-msg').textContent;
+  const encoded = encodeURIComponent(msg);
+  window.open(`https://wa.me/?text=${encoded}`, '_blank');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+renderDups();
+buildSelect();
+</script>
+</body>
+</html>
