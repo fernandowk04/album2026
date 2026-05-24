@@ -84,6 +84,10 @@ body{font-family:Arial,sans-serif;background:#F0F4F8;min-height:100vh;padding-bo
     <p class="tip">Selecione os times abaixo e marque os números que você tem repetidos. Vou verificar se preciso de algum!</p>
 
     <div class="field">
+      <label>Seu nome (para a reserva)</label>
+      <input type="text" id="nome-amigo" placeholder="ex: João Silva" maxlength="40">
+    </div>
+    <div class="field">
       <label>Selecione o time</label>
       <select id="sel-team" onchange="loadTeamNums()">
         <option value="">— escolha um time —</option>
@@ -116,6 +120,12 @@ body{font-family:Arial,sans-serif;background:#F0F4F8;min-height:100vh;padding-bo
   <!-- COMO FUNCIONA -->
   <div class="card">
     <h3>ℹ️ Como funciona</h3>
+    <div style="background:#FFFDE7;border:1.5px solid #FFB300;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#7B5B00;line-height:1.6">
+      <b>✨ Regra das figurinhas especiais:</b><br>
+      As figurinhas <b>#1 de cada time</b> (escudos brilhantes) e as <b>FWC</b> são especiais.<br>
+      • 1 especial ↔ 1 especial<br>
+      • 1 especial ↔ 2 normais
+    </div>
     <div class="step">
       <div class="step-num">1</div>
       <div class="step-txt">Veja nossas figurinhas repetidas disponíveis para troca acima.</div>
@@ -130,7 +140,7 @@ body{font-family:Arial,sans-serif;background:#F0F4F8;min-height:100vh;padding-bo
     </div>
     <div class="step">
       <div class="step-num">4</div>
-      <div class="step-txt">Manda a proposta pelo WhatsApp e a gente combina a troca! 🤝</div>
+      <div class="step-txt">Manda a proposta pelo WhatsApp — a mensagem já vem com um <b>link de reserva</b>. Quando o Gabriel ou Bernardo clicar, as figurinhas ficam reservadas para você automaticamente! 🤝</div>
     </div>
   </div>
 
@@ -139,39 +149,126 @@ body{font-family:Arial,sans-serif;background:#F0F4F8;min-height:100vh;padding-bo
 <script>
 // ── DADOS: duplicatas que Gabriel e Bernardo têm ──────────────────────────
 const MINHAS_DUPLICATAS = [
-  {grp:'A',team:'MEX',num:12},{grp:'A',team:'RSA',num:4},{grp:'A',team:'RSA',num:4},{grp:'A',team:'RSA',num:16},
-  {grp:'B',team:'BRA',num:6},{grp:'B',team:'CAN',num:1},{grp:'B',team:'CAN',num:7},{grp:'B',team:'CAN',num:11},
-  {grp:'B',team:'QAT',num:10},{grp:'B',team:'QAT',num:10},{grp:'B',team:'QAT',num:14},{grp:'B',team:'QAT',num:15},{grp:'B',team:'SUI',num:12},
-  {grp:'C',team:'BRA',num:9},{grp:'C',team:'MAR',num:10},{grp:'C',team:'SCO',num:3},{grp:'C',team:'SCO',num:3},{grp:'C',team:'SCO',num:4},{grp:'C',team:'SCO',num:7},
-  {grp:'D',team:'AUS',num:1},{grp:'D',team:'AUS',num:12},{grp:'D',team:'AUS',num:14},{grp:'D',team:'AUS',num:17},
-  {grp:'E',team:'CIV',num:6},{grp:'E',team:'CIV',num:11},{grp:'E',team:'CIV',num:14},{grp:'E',team:'CUW',num:1},{grp:'E',team:'CUW',num:6},{grp:'E',team:'CUW',num:9},
-  {grp:'E',team:'KOR',num:4},{grp:'E',team:'KOR',num:6},{grp:'E',team:'KOR',num:10},
-  {grp:'F',team:'NED',num:1},{grp:'F',team:'NED',num:17},{grp:'F',team:'NED',num:19},
-  {grp:'G',team:'EGY',num:2},{grp:'G',team:'EGY',num:6},{grp:'G',team:'IRN',num:8},{grp:'G',team:'NZL',num:10},
-  {grp:'H',team:'ESP',num:2},{grp:'H',team:'ESP',num:6},{grp:'H',team:'KSA',num:7},{grp:'H',team:'KSA',num:12},{grp:'H',team:'KSA',num:17},
-  {grp:'I',team:'FRA',num:7},{grp:'I',team:'FRA',num:20},{grp:'I',team:'JPN',num:6},{grp:'I',team:'JPN',num:8},{grp:'I',team:'JPN',num:8},{grp:'I',team:'JPN',num:12},
-  {grp:'I',team:'NOR',num:2},{grp:'I',team:'NOR',num:4},{grp:'I',team:'NOR',num:8},{grp:'I',team:'NOR',num:10},{grp:'I',team:'NOR',num:12},
-  {grp:'I',team:'SEN',num:6},{grp:'I',team:'SEN',num:16},{grp:'I',team:'SEN',num:20},
-  {grp:'J',team:'ALG',num:7},{grp:'J',team:'ALG',num:11},{grp:'J',team:'ALG',num:20},{grp:'J',team:'ARG',num:9},{grp:'J',team:'JOR',num:1},{grp:'J',team:'JOR',num:2},
-  {grp:'K',team:'COL',num:3},{grp:'K',team:'COL',num:20},{grp:'K',team:'POR',num:12},
-  {grp:'L',team:'CRO',num:1},{grp:'L',team:'GHA',num:7},{grp:'L',team:'GHA',num:17},{grp:'L',team:'PAN',num:8},{grp:'L',team:'PAN',num:12},
+  {grp:'I',team:'JPN',num:8},
+  {grp:'I',team:'JPN',num:6},
+  {grp:'B',team:'CAN',num:11},
+  {grp:'B',team:'CAN',num:7},
+  {grp:'B',team:'SUI',num:12},
+  {grp:'B',team:'SUI',num:5},
+  {grp:'C',team:'SCO',num:4},
+  {grp:'C',team:'SCO',num:4},
+  {grp:'C',team:'SCO',num:7},
+  {grp:'C',team:'SCO',num:3},
+  {grp:'I',team:'SEN',num:16},
+  {grp:'I',team:'SEN',num:6},
+  {grp:'I',team:'SEN',num:9},
+  {grp:'I',team:'SEN',num:14},
+  {grp:'K',team:'COL',num:11},
+  {grp:'H',team:'ESP',num:18},
+  {grp:'G',team:'EGY',num:3},
+  {grp:'A',team:'RSA',num:10},
+  {grp:'E',team:'CUW',num:18},
+  {grp:'J',team:'JOR',num:10},
+  {grp:'G',team:'BEL',num:17},
+  {grp:'J',team:'ARG',num:2},
+  {grp:'F',team:'NED',num:18},
+  {grp:'B',team:'QAT',num:12},
+  {grp:'I',team:'FRA',num:7},
+  {grp:'A',team:'MEX',num:7},
+  {grp:'B',team:'CAN',num:16},
+  {grp:'B',team:'CAN',num:20},
+  {grp:'J',team:'JOR',num:2},
+  {grp:'D',team:'PAR',num:18},
+  {grp:'C',team:'HAI',num:10},
+  {grp:'G',team:'BEL',num:4},
+  {grp:'E',team:'GER',num:19},
+  {grp:'G',team:'IRN',num:8},
+  {grp:'L',team:'GHA',num:12},
+  {grp:'K',team:'POR',num:5},
+  {grp:'D',team:'AUS',num:10},
+  {grp:'L',team:'PAN',num:4},
+  {grp:'H',team:'KSA',num:17},
+  {grp:'H',team:'ESP',num:2},
+  {grp:'J',team:'ARG',num:18},
+  {grp:'B',team:'QAT',num:10},
+  {grp:'L',team:'PAN',num:14},
+  {grp:'L',team:'PAN',num:12},
+  {grp:'L',team:'PAN',num:8},
+  {grp:'G',team:'EGY',num:6},
+  {grp:'E',team:'CIV',num:14},
+  {grp:'E',team:'CIV',num:11},
+  {grp:'A',team:'RSA',num:4},
+  {grp:'A',team:'RSA',num:4},
+  {grp:'E',team:'CUW',num:9},
+  {grp:'E',team:'CUW',num:6},
+  {grp:'J',team:'ALG',num:16},
+  {grp:'D',team:'AUS',num:1},
+  {grp:'C',team:'BRA',num:2},
+  {grp:'C',team:'BRA',num:9},
+  {grp:'I',team:'FRA',num:20},
+  {grp:'I',team:'FRA',num:7},
+  {grp:'H',team:'ESP',num:2},
+  {grp:'H',team:'ESP',num:6},
+  {grp:'K',team:'COL',num:3},
+  {grp:'K',team:'COL',num:16},
+  {grp:'K',team:'COL',num:20},
+  {grp:'I',team:'NOR',num:16},
+  {grp:'I',team:'NOR',num:12},
+  {grp:'I',team:'JPN',num:12},
+  {grp:'K',team:'POR',num:1},
+  {grp:'E',team:'CUW',num:1},
+  {grp:'L',team:'PAN',num:6},
+  {grp:'B',team:'CAN',num:12},
+  {grp:'J',team:'ARG',num:15},
+  {grp:'C',team:'SCO',num:9},
+  {grp:'J',team:'AUT',num:9},
+  {grp:'J',team:'AUT',num:3},
+  {grp:'L',team:'GHA',num:2},
+  {grp:'L',team:'ENG',num:8},
+  {grp:'E',team:'CUW',num:14},
+  {grp:'C',team:'SCO',num:2},
+  {grp:'C',team:'HAI',num:3},
+  {grp:'J',team:'JOR',num:1},
+  {grp:'J',team:'ALG',num:7},
+  {grp:'J',team:'ALG',num:11},
+  {grp:'J',team:'ALG',num:20},
+  {grp:'J',team:'ARG',num:9},
+  {grp:'K',team:'POR',num:12},
+  {grp:'A',team:'MEX',num:12},
+  {grp:'G',team:'BEL',num:7},
+  {grp:'C',team:'MAR',num:10},
+  {grp:'D',team:'AUS',num:17},
+  {grp:'G',team:'NZL',num:10},
+  {grp:'G',team:'IRN',num:8},
+  {grp:'L',team:'CRO',num:1},
+  {grp:'I',team:'SEN',num:20},
+  {grp:'H',team:'KSA',num:12},
+  {grp:'H',team:'KSA',num:17},
+  {grp:'H',team:'KSA',num:7},
+  {grp:'E',team:'KOR',num:6},
+  {grp:'E',team:'KOR',num:10},
+  {grp:'E',team:'KOR',num:4},
+  {grp:'L',team:'GHA',num:17},
+  {grp:'L',team:'GHA',num:7},
+  {grp:'B',team:'QAT',num:10},
+  {grp:'B',team:'QAT',num:15}
 ];
 
 // ── DADOS: figurinhas que ainda faltam para Gabriel e Bernardo ────────────
 const MINHAS_FALTANTES = {
-  A:{MEX:[1,3,5,8,9,13,20],RSA:[1,7,9,11,13,14,15,17,18],KOR:[14,17,18,19],CZE:[6,9,12,13,14,16,18,19,20]},
-  B:{CAN:[4,9,10,15,17,18,19],BIH:[3,4,7,8,11,13,16,17,19,20],QAT:[1,5,8,11,13,16,17,20],SUI:[4,6,10,15,17,18,19,20]},
-  C:{BRA:[1,3,8,11,20],MAR:[1,5,8,9,12,16,18,20],HAI:[1,4,7,8,11,12,13,14,16],SCO:[1,18,20]},
-  D:{USA:[1,6,10,13,17,18,19,20],PAR:[7,11,16,17,19,20],AUS:[3,6,19,20],TUR:[2,4,5,6,7,8,9,11,12,13]},
-  E:{GER:[1,3,4,8,11,15,16,20],CUW:[3,4,7,8,11,15,16,20],CIV:[1,2,3,4,5,7,9,12,13,17,20],ECU:[1,5,6,7,9,13,15,18,19]},
+  A:{MEX:[1,5,9,13,20],RSA:[1,7,9,11,13,14,15,17,18],KOR:[14,17,18,19],CZE:[6,9,12,13,14,16,18,19,20]},
+  B:{CAN:[4,9,10,15,17,18,19],BIH:[3,4,7,8,11,13,16,17,19,20],QAT:[1,5,8,13,16,17,20],SUI:[4,6,10,15,17,18,19,20]},
+  C:{BRA:[1,3,11,20],MAR:[1,5,9,12,16,18],HAI:[1,4,7,8,11,12,13,14,16],SCO:[20]},
+  D:{USA:[1,6,13,17,18,19,20],PAR:[11,16,17,19],AUS:[3,6,19,20],TUR:[2,4,5,6,7,8,9,11,12,13]},
+  E:{GER:[1,3,4,8,15,16,20],CUW:[3,4,7,8,11,16,20],CIV:[1,2,3,5,7,9,12,13,17,20],ECU:[1,5,7,9,13,15]},
   F:{NED:[2,3,6,7,8,11,20],JPN:[1,5,9,10,18],SWE:[7,8,10,12,16,17,20],TUN:[3,4,5,6,8,12,17,20]},
-  G:{BEL:[1,2,5,6,9,12,13,18],EGY:[3,4,7,8,13,15,16,18,20],IRN:[2,4,6,7,9,10,11,14,15,16,18,19],NZL:[4,7,8,11,15,16,17]},
-  H:{ESP:[3,12,15,17,20],CPV:[3,7,10,11,15,16,20],KSA:[2,4,6,10,11,16],URU:[3,4,5,10,12,13,19]},
-  I:{FRA:[2,5,8,9,12,19],SEN:[1,7,11,12,17],IRQ:[1,2,5,6,8,9,10,15,18,19],NOR:[1,3,5,20]},
-  J:{ARG:[1,3,4,17],ALG:[3,5,9,10,14,15,18],AUT:[1,4,5,7,8,11,12,14,16,17,20],JOR:[3,4,5,7,8,9,11,12,14,16,17,18,19,20]},
-  K:{POR:[2,4,5,11,15,16,19],COD:[2,4,5,6,7,9,13,14,18],UZB:[1,2,3,8,12,18],COL:[1,2,6,8,9,13,15]},
-  L:{ENG:[15,18],CRO:[2,3,5,6,7,9,15,19],GHA:[8,13,19],PAN:[5,13,15,19,20]},
-  ESP:{FWC:[1,4,6,10,14,17,18,19],'COCA-COLA':[1,4,5,8,9,10,11,13,14]}
+  G:{BEL:[1,2,5,6,9,12,13,18],EGY:[4,7,8,13,16,18],IRN:[2,6,7,9,10,11,14,15,16,19],NZL:[4,7,8,11,15,16,17]},
+  H:{ESP:[3,12,15,17,20],CPV:[3,7,10,11,15,16,20],KSA:[2,4,6,10,16],URU:[3,4,5,10,12,13,19]},
+  I:{FRA:[2,5,8,9,12,19],SEN:[1,12,17],IRQ:[1,2,5,6,8,9,10,15,18,19],NOR:[1,3,5,20]},
+  J:{ARG:[1,3,4,17],ALG:[3,5,10,15,18],AUT:[1,4,7,8,11,12,16,17,20],JOR:[3,4,5,7,8,9,11,12,14,16,17,18,20]},
+  K:{POR:[2,4,11,15,16,19],COD:[2,4,5,6,7,9,13,14,18],UZB:[1,2,3,8,12,18],COL:[1,2,6,8,9,13,15]},
+  L:{ENG:[15,18],CRO:[2,3,5,6,7,9,15,19],GHA:[13,19],PAN:[13,15,19,20]},
+  ESP:{FWC:[1,4,6,10,14,17,18,19],COCA-COLA:[1,4,5,8,9,10,11,13,14]}
 };
 
 const NAMES={
@@ -195,7 +292,34 @@ let amigoTem = []; // [{grp,team,num}]
 let selectedNums = new Set();
 
 // ── Renderizar duplicatas ─────────────────────────────────────────────────
+function isSpecial(team, num){
+  // #1 de qualquer time = escudo brilhante
+  if(num === 1) return true;
+  // Toda a coleção FWC
+  if(team === 'FWC') return true;
+  return false;
+}
+
+function getDisponivel(){
+  // Conta disponíveis descontando reservas ativas
+  const reservas = JSON.parse(localStorage.getItem('reservas_copa2026')||'{}');
+  const disp = {};
+  MINHAS_DUPLICATAS.forEach(d=>{
+    const k=`${d.grp}|${d.team}|${d.num}`;
+    disp[k]=(disp[k]||0)+1;
+  });
+  // Desconta reservas não expiradas
+  Object.values(reservas).forEach(r=>{
+    r.items.forEach(({grp,team,num})=>{
+      const k=`${grp}|${team}|${num}`;
+      if(disp[k]>0) disp[k]--;
+    });
+  });
+  return disp;
+}
+
 function renderDups(){
+  const disp = getDisponivel();
   const byTeam = {};
   MINHAS_DUPLICATAS.forEach(d=>{
     const k=`${d.grp}|${d.team}`;
@@ -206,11 +330,20 @@ function renderDups(){
   grid.innerHTML = Object.values(byTeam).map(({grp,team,nums})=>{
     const cnt = {};
     nums.forEach(n=>cnt[n]=(cnt[n]||0)+1);
-    const numsStr = [...new Set(nums)].sort((a,b)=>a-b)
-      .map(n=>cnt[n]>1?`${n}(x${cnt[n]})`:n).join(', ');
-    return `<div class="dup-card">
-      <div class="dup-card-team"><span style="color:#607D8B;font-size:10px">G.${grp}</span> ${team}</div>
-      <div class="dup-card-nums">${numsStr}</div>
+    const dispNums = [...new Set(nums)].sort((a,b)=>a-b);
+    const numsStr = dispNums.map(n=>{
+      const total = cnt[n];
+      const disponivel = disp[`${grp}|${team}|${n}`]||0;
+      if(disponivel===0) return `<span style="color:#BDBDBD;text-decoration:line-through">${n}</span>`;
+      if(total>1) return `<b>${n}</b><span style="color:#2E7D32;font-size:10px">(${disponivel}disp)</span>`;
+      return `<b>${n}</b>`;
+    }).join(', ');
+    const temDisp = dispNums.some(n=>(disp[`${grp}|${team}|${n}`]||0)>0);
+    const hasSpecial = dispNums.some(n=>isSpecial(team,n)&&(disp[`${grp}|${team}|${n}`]||0)>0);
+    return `<div class="dup-card" style="${!temDisp?'opacity:0.5':''}${hasSpecial?';border:1.5px solid #FFB300;background:#FFFDE7':''}">
+      <div class="dup-card-team"><span style="color:#607D8B;font-size:10px">G.${grp}</span> ${team}${hasSpecial?' <span style="font-size:11px">✨</span>':''}</div>
+      <div class="dup-card-nums" style="font-size:11px">${numsStr}</div>
+      ${!temDisp?'<div style="font-size:10px;color:#D32F2F;margin-top:2px">⛔ Esgotado</div>':''}
     </div>`;
   }).join('');
 }
@@ -297,14 +430,8 @@ function calcMatches(){
     return MINHAS_FALTANTES[grp]?.[team]?.includes(num);
   });
 
-  // O que EU posso DAR ao amigo (minhas duplicatas — uma por uma disponível)
-  // Para cada figurinha que eu vou receber, preciso oferecer uma em troca
-  // Mostrar lista de minhas dups disponíveis para ele escolher
-  const dupDisp = {};
-  MINHAS_DUPLICATAS.forEach(d=>{
-    const k=`${d.grp}|${d.team}|${d.num}`;
-    dupDisp[k]=(dupDisp[k]||0)+1;
-  });
+  // O que EU posso DAR — usando disponibilidade real (com reservas)
+  const dupDisp = getDisponivel();
 
   if(!euRecebo.length){
     content.innerHTML = `<div class="result-box none">
@@ -318,13 +445,12 @@ function calcMatches(){
     return;
   }
 
-  // Monta proposta de troca equilibrada
-  // Para cada fig que eu recebo, sugiro uma minha dup em troca
-  const dupKeys = Object.keys(dupDisp);
-  const propostas = euRecebo.map((fig,i)=>{
-    // pegar uma dup disponível para dar
-    const chave = dupKeys.find(k=>dupDisp[k]>0);
-    if(chave) dupDisp[chave]--;
+  // Monta proposta usando disponibilidade real
+  const dispCopy = {...dupDisp};
+  const dispKeys = Object.keys(dispCopy).filter(k=>dispCopy[k]>0);
+  const propostas = euRecebo.map(fig=>{
+    const chave = dispKeys.find(k=>dispCopy[k]>0);
+    if(chave) dispCopy[chave]--;
     const [dg,dt,dn] = chave ? chave.split('|') : ['?','?','?'];
     return {
       euRecebo: fig,
@@ -332,25 +458,67 @@ function calcMatches(){
     };
   });
 
-  let html = `<div class="result-box">
+  // Verifica se tem estoque para todas
+  const semEstoque = propostas.filter(p=>!p.euDou);
+
+  let resultHtml = `<div class="result-box">
     <div class="result-title">🎉 ${euRecebo.length} troca(s) possível(is)!</div>`;
 
-  propostas.forEach(({euRecebo:r, euDou:d})=>{
-    html += `<div class="match-row">
-      <span>Você me dá: <span class="match-get">G.${r.grp} ${r.team} #${r.num}</span></span>
+  // Regra especial: ✨ especial (num=1 ou FWC) vale por 1 especial OU 2 normais
+  const regrasEsp = [];
+  propostas.forEach(({euRecebo:r,euDou:d})=>{
+    const esgotado = !d;
+    const receboEsp = isSpecial(r.team, r.num);
+    const douEsp = d && isSpecial(d.team, d.num);
+    let regraLabel = '';
+    if(receboEsp && !douEsp && d){
+      // amigo me dá especial, eu dou normal — preciso dar 2 normais
+      // pegar mais uma dup normal disponível
+      const extra = Object.keys(dispCopy).find(k=>dispCopy[k]>0 && !isSpecial(k.split('|')[1], parseInt(k.split('|')[2])));
+      if(extra){
+        dispCopy[extra]--;
+        const [eg,et,en] = extra.split('|');
+        regraLabel = ` <span style="font-size:10px;color:#E65100">✨ Especial! Eu te dou mais: ${et} #${en}</span>`;
+        regrasEsp.push({team:et,num:parseInt(en),grp:eg});
+      } else {
+        regraLabel = ` <span style="font-size:10px;color:#E65100">✨ Especial! (sem 2ª normal disponível)</span>`;
+      }
+    } else if(receboEsp && douEsp){
+      regraLabel = ` <span style="font-size:10px;color:#FFB300">✨ Especial por especial ✅</span>`;
+    }
+    resultHtml += `<div class="match-row" style="${esgotado?'opacity:0.5':''}">
+      <span>Você me dá: <span class="match-get">${receboEsp?'✨ ':''}G.${r.grp} ${r.team} #${r.num}</span></span>
       <span class="arrow">⇄</span>
-      <span>Eu te dou: <span class="match-give">${d ? `G.${d.grp} ${d.team} #${d.num}` : '(combinar)'}</span></span>
+      <span>Eu te dou: <span class="match-give">${d?`${douEsp?'✨ ':''}G.${d.grp} ${d.team} #${d.num}`:'<span style="color:#D32F2F">⛔ Sem estoque</span>'}</span>${regraLabel}</span>
     </div>`;
   });
-  html += `</div>`;
-  content.innerHTML = html;
+  if(semEstoque.length){
+    resultHtml += `<p style="font-size:11px;color:#E65100;margin-top:8px">⚠️ ${semEstoque.length} figurinha(s) sem estoque disponível no momento — pode haver outra reserva ativa.</p>`;
+  }
+  resultHtml += `</div>`;
+  content.innerHTML = resultHtml;
+
+  // Salvar reserva no localStorage
+  const nomeEl = document.getElementById('nome-amigo');
+  const nome = nomeEl ? nomeEl.value.trim() || 'Amigo' : 'Amigo';
+  const reservaId = Date.now().toString(36);
+  const reservas = JSON.parse(localStorage.getItem('reservas_copa2026')||'{}');
+  reservas[reservaId] = {
+    nome,
+    ts: Date.now(),
+    items: propostas.filter(p=>p.euDou).map(p=>p.euDou)
+  };
+  localStorage.setItem('reservas_copa2026', JSON.stringify(reservas));
 
   // Montar mensagem WhatsApp
   const linhas = propostas.map(({euRecebo:r,euDou:d})=>
-    `  • Você me dá: ${r.team} #${r.num} ↔ Eu te dou: ${d?`${d.team} #${d.num}`:'(combinar)'}`
+    `  • Você me dá: ${r.team} #${r.num} ↔ Eu te dou: ${d?`${d.team} #${d.num}`:'(sem estoque)'}`
   ).join('\n');
 
   const msg = `Oi! Vi suas figurinhas no app de trocas do Gabriel & Bernardo 👋
+
+Meu nome: ${nome}
+Código da reserva: #${reservaId}
 
 Tenho interesse em trocar:
 ${linhas}
@@ -359,7 +527,28 @@ Topas? Me manda mensagem pra combinarmos! ⚽🏆
 
 _Álbum FIFA World Cup 2026 - Panini_`;
 
-  document.getElementById('wpp-msg').textContent = msg;
+  // Gerar link mágico
+  const linkMagico = gerarLinkMagico(
+    nome,
+    euRecebo,
+    propostas.filter(p=>p.euDou).map(p=>p.euDou)
+  );
+
+  const msgCompleta = `Oi! Vi suas figurinhas no app de trocas do Gabriel & Bernardo 👋
+
+Meu nome: ${nome}
+
+Tenho interesse em trocar:
+${linhas}
+
+👉 Clica aqui para aprovar a reserva:
+${linkMagico}
+
+Topas? Me manda mensagem pra combinarmos! ⚽🏆
+
+_Álbum FIFA World Cup 2026 - Panini_`;
+
+  document.getElementById('wpp-msg').textContent = msgCompleta;
   wppWrap.classList.remove('hidden');
 }
 
@@ -367,6 +556,15 @@ function sendWpp(){
   const msg = document.getElementById('wpp-msg').textContent;
   const encoded = encodeURIComponent(msg);
   window.open(`https://wa.me/?text=${encoded}`, '_blank');
+}
+
+function gerarLinkMagico(nome, euRecebo, euDou){
+  // euRecebo = o que o amigo vai me dar (minhas faltantes que ele tem)
+  // euDou = o que eu vou dar ao amigo (minhas duplicatas)
+  const dou = euDou.filter(d=>d).map(d=>`${d.team}${d.num}`).join(',');
+  const recebo = euRecebo.map(r=>`${r.team}${r.num}`).join(',');
+  const nomeEnc = encodeURIComponent(nome);
+  return `https://fernandowk04.github.io/album2026?reserva=${nomeEnc}&dou=${dou}&quero=${recebo}`;
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────
