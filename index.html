@@ -452,6 +452,11 @@ function switchTab(name,btn){
   if(name==='reservas')renderReservas();
 }
 function imprimirFaltantes(){
+  const GRP_CLR={
+    A:'#1565C0',B:'#6A1B9A',C:'#2E7D32',D:'#AD1457',
+    E:'#E65100',F:'#00838F',G:'#558B2F',H:'#4527A0',
+    I:'#0277BD',J:'#BF360C',K:'#00695C',L:'#6D4C41',ESP:'#F57F17'
+  };
   const NAMES_PT={
     MEX:'México',RSA:'África do Sul',KOR:'Coreia do Sul',CZE:'Rep. Checa',
     CAN:'Canadá',BIH:'Bósnia',QAT:'Catar',SUI:'Suíça',
@@ -465,12 +470,7 @@ function imprimirFaltantes(){
     ARG:'Argentina',ALG:'Argélia',AUT:'Áustria',JOR:'Jordânia',
     POR:'Portugal',COD:'Congo',UZB:'Uzbequistão',COL:'Colômbia',
     ENG:'Inglaterra',CRO:'Croácia',GHA:'Gana',PAN:'Panamá',
-    FWC:'FWC Especiais','COCA-COLA':'Coca-Cola'
-  };
-  const GRP_CLR={
-    A:'#1565C0',B:'#6A1B9A',C:'#2E7D32',D:'#AD1457',
-    E:'#E65100',F:'#00838F',G:'#558B2F',H:'#4527A0',
-    I:'#0277BD',J:'#BF360C',K:'#00695C',L:'#6D4C41',ESP:'#F57F17'
+    'COCA-COLA':'Coca-Cola',FWC:'FWC'
   };
 
   const totalMiss = countMissing();
@@ -478,89 +478,83 @@ function imprimirFaltantes(){
   const pct = (totalGot/980*100).toFixed(1);
   const hoje = new Date().toLocaleDateString('pt-BR');
 
-  let rows = '';
-  let anyGroup = false;
+  let cols = ['','','',''];
+  let colIdx = 0;
+  
   for(const grp in STATE.missing){
-    let grpRows = '';
+    const clr = GRP_CLR[grp]||'#333';
+    let grpHtml = '';
     let grpTotal = 0;
     for(const team in STATE.missing[grp]){
       const arr = STATE.missing[grp][team];
       if(!arr.length) continue;
       const sorted = [...arr].sort((a,b)=>a-b);
-      const nums = sorted.map(n=>{
+      const cards = sorted.map(n=>{
         const esp = (n===1||team==='FWC');
-        return esp ? `<span class="esp">${n}✨</span>` : n;
-      }).join(', ');
-      grpRows += `<tr>
-        <td class="td-grp" style="background:${GRP_CLR[grp]}22;border-left:3px solid ${GRP_CLR[grp]}">
-          <b>${team}</b><br><span class="sub">${NAMES_PT[team]||team}</span>
-        </td>
-        <td class="td-nums">${nums}</td>
-        <td class="td-qt">${arr.length}</td>
-      </tr>`;
+        return `<span class="num-card${esp?' esp':''}">${n}${esp?'✨':''}</span>`;
+      }).join('');
+      grpHtml += `<div class="team-block">
+        <div class="team-name" style="color:${clr}">${team} <span class="team-full">${NAMES_PT[team]||team}</span></div>
+        <div class="num-wrap">${cards}</div>
+      </div>`;
       grpTotal += arr.length;
     }
-    if(!grpRows) continue;
-    anyGroup = true;
-    rows += `<tr class="grp-hdr">
-      <td colspan="3" style="background:${GRP_CLR[grp]};color:#fff;padding:4px 8px;font-size:11px;font-weight:700;letter-spacing:1px">
-        GRUPO ${grp} — ${grpTotal} faltantes
-      </td>
-    </tr>${grpRows}`;
+    if(!grpHtml) continue;
+    cols[colIdx] += `<div class="grp-block">
+      <div class="grp-title" style="background:${clr}">G.${grp} — ${grpTotal} fig.</div>
+      ${grpHtml}
+    </div>`;
+    colIdx = (colIdx+1) % 4;
   }
 
   const win = window.open('','_blank');
   win.document.write(`<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8">
-<title>Faltantes Copa 2026 — Gabriel & Bernardo</title>
+<title>Faltantes Copa 2026</title>
 <style>
-  @page{size:A4;margin:12mm 10mm}
+  @page{size:A4 landscape;margin:6mm}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:Arial,sans-serif;font-size:10px;color:#111}
-  .header{background:#0D1B4B;color:#fff;padding:8px 12px;border-radius:6px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-  .header-title{font-size:14px;font-weight:700;color:#FFB300}
-  .header-sub{font-size:9px;color:rgba(255,255,255,0.7);margin-top:2px}
-  .kpis{display:flex;gap:6px;margin-bottom:8px}
-  .kpi{flex:1;background:#F0F4F8;border-radius:4px;padding:5px 8px;text-align:center;border:1px solid #E0E0E0}
-  .kpi-val{font-size:14px;font-weight:700;color:#0D1B4B}
-  .kpi-lbl{font-size:8px;color:#90A4AE;text-transform:uppercase;letter-spacing:.3px}
-  .kpi.miss .kpi-val{color:#D32F2F}
-  .kpi.got .kpi-val{color:#2E7D32}
-  table{width:100%;border-collapse:collapse;font-size:9px}
-  .grp-hdr td{font-size:10px}
-  .td-grp{padding:4px 6px;width:90px;vertical-align:middle;border-bottom:1px solid #E0E0E0}
-  .td-grp b{font-size:10px}
-  .sub{color:#90A4AE;font-size:8px}
-  .td-nums{padding:4px 6px;border-bottom:1px solid #E0E0E0;line-height:1.6;color:#333}
-  .td-qt{padding:4px 6px;width:30px;text-align:center;border-bottom:1px solid #E0E0E0;font-weight:700;color:#D32F2F}
-  .esp{color:#E65100;font-weight:700}
-  .footer{margin-top:8px;text-align:center;font-size:8px;color:#90A4AE;border-top:1px solid #E0E0E0;padding-top:6px}
-  .regra{background:#FFFDE7;border:1px solid #FFB300;border-radius:4px;padding:5px 10px;margin-bottom:8px;font-size:9px;color:#7B5B00}
+  body{font-family:Arial,sans-serif;font-size:8px;color:#111;background:#fff}
+  .header{background:#0D1B4B;color:#fff;padding:4px 8px;border-radius:4px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+  .header-title{font-size:11px;font-weight:700;color:#FFB300}
+  .header-sub{font-size:7px;color:rgba(255,255,255,0.7)}
+  .header-pct{font-size:11px;font-weight:700;color:#FFB300}
+  .regra{background:#FFFDE7;border:1px solid #FFB300;border-radius:3px;padding:3px 8px;margin-bottom:4px;font-size:7px;color:#7B5B00}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+  .col{display:flex;flex-direction:column;gap:4px}
+  .grp-block{border:1px solid #E0E0E0;border-radius:4px;overflow:hidden;break-inside:avoid}
+  .grp-title{color:#fff;padding:2px 6px;font-size:8px;font-weight:700;letter-spacing:.5px}
+  .team-block{padding:2px 4px;border-bottom:1px solid #F0F0F0}
+  .team-block:last-child{border-bottom:none}
+  .team-name{font-size:7px;font-weight:700;margin-bottom:2px}
+  .team-full{font-weight:400;color:#90A4AE;font-size:6px}
+  .num-wrap{display:flex;flex-wrap:wrap;gap:2px}
+  .num-card{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1px solid #BDBDBD;border-radius:3px;font-size:7px;font-weight:700;color:#333;background:#fff;cursor:pointer}
+  .num-card.esp{border-color:#FFB300;background:#FFF9C4;color:#E65100;font-size:6px}
+  .footer{margin-top:4px;text-align:center;font-size:6px;color:#90A4AE}
   @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head><body>
 <div class="header">
   <div>
     <div class="header-title">🏆 Figurinhas Faltantes — Copa do Mundo 2026</div>
-    <div class="header-sub">Gabriel &amp; Bernardo · Panini FIFA WC 2026 · Impresso em ${hoje}</div>
+    <div class="header-sub">Gabriel & Bernardo · Panini FIFA WC 2026 · ${hoje}</div>
   </div>
-  <div style="text-align:right;font-size:11px;color:#FFB300;font-weight:700">${pct}% completo</div>
+  <div style="text-align:center;margin:0 12px">
+    <span style="color:#FFB300;font-size:9px;font-weight:700">${totalMiss} faltantes</span>
+    <span style="color:rgba(255,255,255,0.5);margin:0 4px">|</span>
+    <span style="color:#A5D6A7;font-size:9px;font-weight:700">${totalGot} coladas</span>
+  </div>
+  <div class="header-pct">${pct}% completo</div>
 </div>
-<div class="kpis">
-  <div class="kpi"><div class="kpi-val">980</div><div class="kpi-lbl">Total</div></div>
-  <div class="kpi miss"><div class="kpi-val">${totalMiss}</div><div class="kpi-lbl">Faltantes</div></div>
-  <div class="kpi got"><div class="kpi-val">${totalGot}</div><div class="kpi-lbl">Coladas</div></div>
+<div class="regra">✨ Especiais (escudo #1 e FWC): 1 especial ↔ 1 especial  |  1 especial ↔ 2 normais  |  □ = riscar quando conseguir</div>
+<div class="grid">
+  <div class="col">${cols[0]}</div>
+  <div class="col">${cols[1]}</div>
+  <div class="col">${cols[2]}</div>
+  <div class="col">${cols[3]}</div>
 </div>
-<div class="regra">✨ <b>Regra especiais:</b> Figurinhas #1 (escudos brilhantes) e FWC são especiais — valem 1 especial ↔ 1 especial  ou  1 especial ↔ 2 normais</div>
-<table>
-  <thead><tr style="background:#E8ECF0">
-    <th style="padding:4px 6px;text-align:left;font-size:9px">Time</th>
-    <th style="padding:4px 6px;text-align:left;font-size:9px">Figurinhas faltantes (✨ = especial)</th>
-    <th style="padding:4px 6px;text-align:center;font-size:9px">Qtd</th>
-  </tr></thead>
-  <tbody>${rows}</tbody>
-</table>
-<div class="footer">✨ = figurinha especial brilhante (escudo #1 ou FWC) · Troca: 1 especial ↔ 1 especial | 1 especial ↔ 2 normais</div>
+<div class="footer">✨ = especial brilhante · Os quadradinhos são para riscar quando conseguir a figurinha!</div>
 </body></html>`);
   win.document.close();
   win.focus();
