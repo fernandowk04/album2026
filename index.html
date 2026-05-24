@@ -73,6 +73,19 @@ tr:hover td{background:#F5F9FF}
 .dup-chip{background:#FFF8E1;color:#7B5B00;border:1px solid #FFB300;border-radius:20px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:500;display:flex;align-items:center;gap:4px}
 .dup-chip:hover{background:#FFB300;color:#0D1B4B}
 .empty{text-align:center;padding:2rem;color:#90A4AE;font-size:13px}
+.reserva-card{border:1.5px solid #FFB300;border-radius:10px;padding:1rem;margin-bottom:10px;background:#FFFDE7}
+.reserva-card.aprovada{border-color:#A5D6A7;background:#F0FFF4}
+.reserva-card.recusada{border-color:#FFCDD2;background:#FFF5F5;opacity:0.6}
+.reserva-nome{font-size:14px;font-weight:700;color:#0D1B4B;margin-bottom:6px}
+.reserva-items{font-size:12px;color:#333;margin-bottom:10px;line-height:1.8}
+.reserva-actions{display:flex;gap:8px}
+.btn.aprovar{background:#2E7D32;color:#fff;font-size:12px;padding:6px 14px}
+.btn.recusar{background:#FFCDD2;color:#B71C1C;font-size:12px;padding:6px 14px}
+.badge-status{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700}
+.badge-status.pend{background:#FFF9C4;color:#7B5B00}
+.badge-status.aprov{background:#C8E6C9;color:#1B5E20}
+.badge-status.recus{background:#FFCDD2;color:#B71C1C}
+.tab-alert{background:#D32F2F;color:#fff;border-radius:50%;padding:0 5px;font-size:10px;font-weight:700;margin-left:4px}
 .divider{height:1px;background:#F0F4F8;margin:12px 0}
 .tip{font-size:11px;color:#90A4AE;margin-bottom:10px;line-height:1.5}
 @media(max-width:480px){
@@ -112,6 +125,7 @@ tr:hover td{background:#F5F9FF}
     <button class="tab" onclick="switchTab('faltantes',this)"><i class="ti ti-list"></i><span>Faltantes</span></button>
     <button class="tab" onclick="switchTab('grupos',this)"><i class="ti ti-chart-bar"></i><span>Grupos</span></button>
     <button class="tab" onclick="switchTab('duplicatas',this)"><i class="ti ti-copy"></i><span>Duplicatas</span></button>
+    <button class="tab" id="tab-reservas" onclick="switchTab('reservas',this)"><i class="ti ti-lock"></i><span>Reservas</span></button>
   </div>
 
   <!-- REGISTRAR -->
@@ -152,6 +166,13 @@ tr:hover td{background:#F5F9FF}
       </div>
     </div>
     <div class="card">
+      <h3><i class="ti ti-printer"></i> Imprimir</h3>
+      <p class="tip">Gera uma folha A4 com todas as figurinhas faltantes — perfeita para trocar ao vivo com os amigos!</p>
+      <div class="row">
+        <button class="btn gold" onclick="imprimirFaltantes()"><i class="ti ti-printer"></i> 🖨️ Imprimir lista de faltantes</button>
+      </div>
+    </div>
+    <div class="card">
       <h3><i class="ti ti-settings"></i> Dados</h3>
       <p class="tip">Exporta ou restaura seus dados salvos.</p>
       <div class="row">
@@ -187,6 +208,15 @@ tr:hover td{background:#F5F9FF}
     </div>
   </div>
 
+  <!-- RESERVAS -->
+  <div class="panel" id="panel-reservas">
+    <div class="card">
+      <h3><i class="ti ti-lock"></i> Reservas pendentes</h3>
+      <p class="tip">Quando um amigo enviar o link de reserva pelo WhatsApp, clique em "Aprovar" para travar as figurinhas para ele.</p>
+      <div id="reservas-list"></div>
+    </div>
+  </div>
+
   <!-- DUPLICATAS -->
   <div class="panel" id="panel-duplicatas">
     <div class="card">
@@ -200,19 +230,19 @@ tr:hover td{background:#F5F9FF}
 <script>
 const TOTAL = 980;
 const INITIAL = {
-  A:{MEX:[1,3,5,8,9,13,20],RSA:[1,7,9,11,13,14,15,17,18],KOR:[14,17,18,19],CZE:[6,9,12,13,14,16,18,19,20]},
-  B:{CAN:[4,9,10,15,17,18,19],BIH:[3,4,7,8,11,13,16,17,19,20],QAT:[1,5,8,11,13,16,17,20],SUI:[4,6,10,15,17,18,19,20]},
-  C:{BRA:[1,3,8,11,20],MAR:[1,5,8,9,12,16,18,20],HAI:[1,4,7,8,11,12,13,14,16],SCO:[1,18,20]},
-  D:{USA:[1,6,10,13,17,18,19,20],PAR:[7,11,16,17,19,20],AUS:[3,6,11,19,20],TUR:[2,4,5,6,7,8,9,11,12,13]},
-  E:{GER:[1,3,4,8,11,15,16,20],CUW:[3,4,7,8,11,15,16,20],CIV:[1,2,3,4,5,7,9,12,13,17,20],ECU:[1,2,5,6,7,9,13,15,18,19]},
+  A:{MEX:[1,5,9,13,20],RSA:[1,7,9,11,13,14,15,17,18],KOR:[14,17,18,19],CZE:[6,9,12,13,14,16,18,19,20]},
+  B:{CAN:[4,9,10,15,17,18,19],BIH:[3,4,7,8,11,13,16,17,19,20],QAT:[1,5,8,13,16,17,20],SUI:[4,6,10,15,17,18,19,20]},
+  C:{BRA:[1,3,11,20],MAR:[1,5,9,12,16,18],HAI:[1,4,7,8,11,12,13,14,16],SCO:[20]},
+  D:{USA:[1,6,13,17,18,19,20],PAR:[11,16,17,19],AUS:[3,6,19,20],TUR:[2,4,5,6,7,8,9,11,12,13]},
+  E:{GER:[1,3,4,8,15,16,20],CUW:[3,4,7,8,11,16,20],CIV:[1,2,3,5,7,9,12,13,17,20],ECU:[1,5,7,9,13,15]},
   F:{NED:[2,3,6,7,8,11,20],JPN:[1,5,9,10,18],SWE:[7,8,10,12,16,17,20],TUN:[3,4,5,6,8,12,17,20]},
-  G:{BEL:[1,2,5,6,9,12,13,18],EGY:[3,4,7,8,13,15,16,18,20],IRN:[2,4,6,7,9,10,11,14,15,16,18,19],NZL:[4,7,8,11,15,16,17]},
-  H:{ESP:[3,12,15,17,20],CPV:[3,7,10,11,15,16,20],KSA:[2,4,6,10,11,16],URU:[3,4,5,10,12,13,19]},
-  I:{FRA:[2,5,8,9,12,19],SEN:[1,7,11,12,17],IRQ:[1,2,5,6,8,9,10,15,18,19],NOR:[1,3,5,17,20]},
-  J:{ARG:[1,3,4,17],ALG:[3,5,9,10,14,15,18],AUT:[1,4,5,7,8,11,12,14,16,17,20],JOR:[3,4,5,7,8,9,11,12,14,16,17,18,19,20]},
-  K:{POR:[2,4,5,11,15,16,19],COD:[2,4,5,6,7,9,13,14,18],UZB:[1,2,3,8,12,18],COL:[1,2,6,8,9,13,15]},
-  L:{ENG:[15,18],CRO:[2,3,5,6,7,9,15,19],GHA:[8,13,19],PAN:[5,13,15,19,20]},
-  ESP:{FWC:[1,4,6,10,14,17,18,19],'COCA-COLA':[1,4,5,8,9,10,11,13,14]}
+  G:{BEL:[1,2,5,6,9,12,13,18],EGY:[4,7,8,13,16,18],IRN:[2,6,7,9,10,11,14,15,16,19],NZL:[4,7,8,11,15,16,17]},
+  H:{ESP:[3,12,15,17,20],CPV:[3,7,10,11,15,16,20],KSA:[2,4,6,10,16],URU:[3,4,5,10,12,13,19]},
+  I:{FRA:[2,5,8,9,12,19],SEN:[1,12,17],IRQ:[1,2,5,6,8,9,10,15,18,19],NOR:[1,3,5,20]},
+  J:{ARG:[1,3,4,17],ALG:[3,5,10,15,18],AUT:[1,4,7,8,11,12,16,17,20],JOR:[3,4,5,7,8,9,11,12,14,16,17,18,20]},
+  K:{POR:[2,4,11,15,16,19],COD:[2,4,5,6,7,9,13,14,18],UZB:[1,2,3,8,12,18],COL:[1,2,6,8,9,13,15]},
+  L:{ENG:[15,18],CRO:[2,3,5,6,7,9,15,19],GHA:[13,19],PAN:[13,15,19,20]},
+  ESP:{FWC:[1,4,6,10,14,17,18,19],COCA-COLA:[1,4,5,8,9,10,11,13,14]}
 };
 const NAMES={
   MEX:'México',RSA:'África do Sul',KOR:'Coreia do Sul',CZE:'Rep. Checa',
@@ -237,29 +267,12 @@ const GRP_COLORS={
 const BAR_COLORS=['#1565C0','#2E7D32','#D32F2F','#6A1B9A','#E65100','#00838F','#558B2F','#AD1457','#4527A0','#0277BD','#BF360C','#00695C'];
 
 function loadState(){
-  try{const s=localStorage.getItem('album2026_v4');if(s)return JSON.parse(s);}catch(e){}
-  const st={missing:{},duplicates:[
-    {grp:'A',team:'MEX',num:12},{grp:'A',team:'RSA',num:4},{grp:'A',team:'RSA',num:4},{grp:'A',team:'RSA',num:16},
-    {grp:'B',team:'BRA',num:6},{grp:'B',team:'CAN',num:1},{grp:'B',team:'CAN',num:7},{grp:'B',team:'CAN',num:11},
-    {grp:'B',team:'QAT',num:10},{grp:'B',team:'QAT',num:10},{grp:'B',team:'QAT',num:14},{grp:'B',team:'QAT',num:15},{grp:'B',team:'SUI',num:12},
-    {grp:'C',team:'BRA',num:9},{grp:'C',team:'MAR',num:10},{grp:'C',team:'SCO',num:3},{grp:'C',team:'SCO',num:3},{grp:'C',team:'SCO',num:4},{grp:'C',team:'SCO',num:7},
-    {grp:'D',team:'AUS',num:1},{grp:'D',team:'AUS',num:12},{grp:'D',team:'AUS',num:14},{grp:'D',team:'AUS',num:17},
-    {grp:'E',team:'CIV',num:6},{grp:'E',team:'CIV',num:11},{grp:'E',team:'CIV',num:14},{grp:'E',team:'CUW',num:1},{grp:'E',team:'CUW',num:6},{grp:'E',team:'CUW',num:9},
-    {grp:'E',team:'KOR',num:4},{grp:'E',team:'KOR',num:6},{grp:'E',team:'KOR',num:10},
-    {grp:'F',team:'NED',num:1},{grp:'F',team:'NED',num:17},{grp:'F',team:'NED',num:19},
-    {grp:'G',team:'EGY',num:2},{grp:'G',team:'EGY',num:6},{grp:'G',team:'IRN',num:8},{grp:'G',team:'NZL',num:10},
-    {grp:'H',team:'ESP',num:2},{grp:'H',team:'ESP',num:6},{grp:'H',team:'KSA',num:7},{grp:'H',team:'KSA',num:12},{grp:'H',team:'KSA',num:17},
-    {grp:'I',team:'FRA',num:7},{grp:'I',team:'FRA',num:20},{grp:'I',team:'JPN',num:6},{grp:'I',team:'JPN',num:8},{grp:'I',team:'JPN',num:8},{grp:'I',team:'JPN',num:12},
-    {grp:'I',team:'NOR',num:2},{grp:'I',team:'NOR',num:4},{grp:'I',team:'NOR',num:8},{grp:'I',team:'NOR',num:10},{grp:'I',team:'NOR',num:12},
-    {grp:'I',team:'SEN',num:6},{grp:'I',team:'SEN',num:16},{grp:'I',team:'SEN',num:20},
-    {grp:'J',team:'ALG',num:7},{grp:'J',team:'ALG',num:11},{grp:'J',team:'ALG',num:20},{grp:'J',team:'ARG',num:9},{grp:'J',team:'JOR',num:1},{grp:'J',team:'JOR',num:2},
-    {grp:'K',team:'COL',num:3},{grp:'K',team:'COL',num:20},{grp:'K',team:'POR',num:12},
-    {grp:'L',team:'CRO',num:1},{grp:'L',team:'GHA',num:7},{grp:'L',team:'GHA',num:17},{grp:'L',team:'PAN',num:8},{grp:'L',team:'PAN',num:12}
-  ]};
+  try{const s=localStorage.getItem('album2026_v5');if(s)return JSON.parse(s);}catch(e){}
+  const st={missing:{},duplicates:[{grp:'I',team:'JPN',num:8},{grp:'I',team:'JPN',num:6},{grp:'B',team:'CAN',num:11},{grp:'B',team:'CAN',num:7},{grp:'B',team:'SUI',num:12},{grp:'B',team:'SUI',num:5},{grp:'C',team:'SCO',num:4},{grp:'C',team:'SCO',num:4},{grp:'C',team:'SCO',num:7},{grp:'C',team:'SCO',num:3},{grp:'I',team:'SEN',num:16},{grp:'I',team:'SEN',num:6},{grp:'I',team:'SEN',num:9},{grp:'I',team:'SEN',num:14},{grp:'K',team:'COL',num:11},{grp:'H',team:'ESP',num:18},{grp:'G',team:'EGY',num:3},{grp:'A',team:'RSA',num:10},{grp:'E',team:'CUW',num:18},{grp:'J',team:'JOR',num:10},{grp:'G',team:'BEL',num:17},{grp:'J',team:'ARG',num:2},{grp:'F',team:'NED',num:18},{grp:'B',team:'QAT',num:12},{grp:'I',team:'FRA',num:7},{grp:'A',team:'MEX',num:7},{grp:'B',team:'CAN',num:16},{grp:'B',team:'CAN',num:20},{grp:'J',team:'JOR',num:2},{grp:'D',team:'PAR',num:18},{grp:'C',team:'HAI',num:10},{grp:'G',team:'BEL',num:4},{grp:'E',team:'GER',num:19},{grp:'G',team:'IRN',num:8},{grp:'L',team:'GHA',num:12},{grp:'K',team:'POR',num:5},{grp:'D',team:'AUS',num:10},{grp:'L',team:'PAN',num:4},{grp:'H',team:'KSA',num:17},{grp:'H',team:'ESP',num:2},{grp:'J',team:'ARG',num:18},{grp:'B',team:'QAT',num:10},{grp:'L',team:'PAN',num:14},{grp:'L',team:'PAN',num:12},{grp:'L',team:'PAN',num:8},{grp:'G',team:'EGY',num:6},{grp:'E',team:'CIV',num:14},{grp:'E',team:'CIV',num:11},{grp:'A',team:'RSA',num:4},{grp:'A',team:'RSA',num:4},{grp:'E',team:'CUW',num:9},{grp:'E',team:'CUW',num:6},{grp:'J',team:'ALG',num:16},{grp:'D',team:'AUS',num:1},{grp:'C',team:'BRA',num:2},{grp:'C',team:'BRA',num:9},{grp:'I',team:'FRA',num:20},{grp:'I',team:'FRA',num:7},{grp:'H',team:'ESP',num:2},{grp:'H',team:'ESP',num:6},{grp:'K',team:'COL',num:3},{grp:'K',team:'COL',num:16},{grp:'K',team:'COL',num:20},{grp:'I',team:'NOR',num:16},{grp:'I',team:'NOR',num:12},{grp:'I',team:'JPN',num:12},{grp:'K',team:'POR',num:1},{grp:'E',team:'CUW',num:1},{grp:'L',team:'PAN',num:6},{grp:'B',team:'CAN',num:12},{grp:'J',team:'ARG',num:15},{grp:'C',team:'SCO',num:9},{grp:'J',team:'AUT',num:9},{grp:'J',team:'AUT',num:3},{grp:'L',team:'GHA',num:2},{grp:'L',team:'ENG',num:8},{grp:'E',team:'CUW',num:14},{grp:'C',team:'SCO',num:2},{grp:'C',team:'HAI',num:3},{grp:'J',team:'JOR',num:1},{grp:'J',team:'ALG',num:7},{grp:'J',team:'ALG',num:11},{grp:'J',team:'ALG',num:20},{grp:'J',team:'ARG',num:9},{grp:'K',team:'POR',num:12},{grp:'A',team:'MEX',num:12},{grp:'G',team:'BEL',num:7},{grp:'C',team:'MAR',num:10},{grp:'D',team:'AUS',num:17},{grp:'G',team:'NZL',num:10},{grp:'G',team:'IRN',num:8},{grp:'L',team:'CRO',num:1},{grp:'I',team:'SEN',num:20},{grp:'H',team:'KSA',num:12},{grp:'H',team:'KSA',num:17},{grp:'H',team:'KSA',num:7},{grp:'E',team:'KOR',num:6},{grp:'E',team:'KOR',num:10},{grp:'E',team:'KOR',num:4},{grp:'L',team:'GHA',num:17},{grp:'L',team:'GHA',num:7},{grp:'B',team:'QAT',num:10},{grp:'B',team:'QAT',num:15}]};
   for(const g in INITIAL){st.missing[g]={};for(const t in INITIAL[g])st.missing[g][t]=[...INITIAL[g][t]];}
   return st;
 }
-function saveState(st){try{localStorage.setItem('album2026_v4',JSON.stringify(st));}catch(e){}}
+function saveState(st){try{localStorage.setItem('album2026_v5',JSON.stringify(st));}catch(e){}}
 let STATE=loadState();
 
 function countMissing(){let n=0;for(const g in STATE.missing)for(const t in STATE.missing[g])n+=STATE.missing[g][t].length;return n;}
@@ -321,10 +334,32 @@ function addTrade(){
   showToast(`🤝 Troca confirmada: ${NAMES[s.team]||s.team} #${s.num} colada!`);
   document.getElementById('inp-num2').value='';
 }
+function confirmRemoveDup(idx){
+  if(confirm('Remover essa duplicata da lista de trocas?')) removeDup(idx);
+}
+let lastRemoved = null;
+let undoTimeout = null;
+
 function removeDup(idx){
+  // Guarda para desfazer
+  lastRemoved = {item: STATE.duplicates[idx], idx: idx};
   STATE.duplicates.splice(idx,1);
   saveState(STATE);updateKPIs();renderDuplicatas();
-  showToast('Duplicata removida da lista.');
+  // Toast com botão desfazer
+  const t=document.getElementById('toast');
+  t.innerHTML='Duplicata removida. <button onclick="undoRemove()" style="background:#fff;color:#2E7D32;border:none;border-radius:4px;padding:2px 8px;cursor:pointer;font-weight:700;margin-left:8px">↩ Desfazer</button>';
+  t.className='toast show warn';
+  if(undoTimeout) clearTimeout(undoTimeout);
+  undoTimeout=setTimeout(()=>{t.className='toast';lastRemoved=null;},5000);
+}
+
+function undoRemove(){
+  if(!lastRemoved) return;
+  STATE.duplicates.splice(lastRemoved.idx,0,lastRemoved.item);
+  saveState(STATE);updateKPIs();renderDuplicatas();
+  lastRemoved=null;
+  if(undoTimeout) clearTimeout(undoTimeout);
+  showToast('↩ Desfeito! Figurinha de volta à lista.');
 }
 function renderFaltantes(){
   const fil=document.getElementById('fil-grp').value;
@@ -381,7 +416,7 @@ function renderDuplicatas(){
   el.innerHTML=Object.values(byTeam).map(({grp,team,items})=>`
     <div class="dup-section">
       <div class="dup-team"><span class="grp-chip">${grp}</span> ${team} — ${NAMES[team]||team}</div>
-      <div class="dup-chips">${items.map(({num,idx})=>`<span class="dup-chip" onclick="removeDup(${idx})" title="Clique para remover após a troca"><i class="ti ti-cards"></i> #${num} ×</span>`).join('')}</div>
+      <div class="dup-chips">${items.map(({num,idx})=>`<span class="dup-chip" onclick="confirmRemoveDup(${idx})" title="Clique para remover após a troca"><i class="ti ti-cards"></i> #${num} ×</span>`).join('')}</div>
     </div>`).join('');
 }
 function exportData(){
@@ -401,7 +436,7 @@ function importData(e){
 }
 function resetAll(){
   if(!confirm('Tem certeza? Isso apaga todo o progresso e volta para a lista inicial!'))return;
-  localStorage.removeItem('album2026_v4');STATE=loadState();
+  localStorage.removeItem('album2026_v5');STATE=loadState();
   updateKPIs();buildSelects();renderFaltantes();renderGrupos();renderDuplicatas();
   showToast('Progresso resetado.',true);
 }
@@ -413,8 +448,244 @@ function switchTab(name,btn){
   if(name==='faltantes')renderFaltantes();
   if(name==='grupos')renderGrupos();
   if(name==='duplicatas')renderDuplicatas();
+  if(name==='reservas')renderReservas();
 }
+function imprimirFaltantes(){
+  const NAMES_PT={
+    MEX:'México',RSA:'África do Sul',KOR:'Coreia do Sul',CZE:'Rep. Checa',
+    CAN:'Canadá',BIH:'Bósnia',QAT:'Catar',SUI:'Suíça',
+    BRA:'Brasil',MAR:'Marrocos',HAI:'Haiti',SCO:'Escócia',
+    USA:'EUA',PAR:'Paraguai',AUS:'Austrália',TUR:'Turquia',
+    GER:'Alemanha',CUW:'Curaçao',CIV:'Costa do Marfim',ECU:'Equador',
+    NED:'Holanda',JPN:'Japão',SWE:'Suécia',TUN:'Tunísia',
+    BEL:'Bélgica',EGY:'Egito',IRN:'Irã',NZL:'Nova Zelândia',
+    ESP:'Espanha',CPV:'Cabo Verde',KSA:'Arábia Saudita',URU:'Uruguai',
+    FRA:'França',SEN:'Senegal',IRQ:'Iraque',NOR:'Noruega',
+    ARG:'Argentina',ALG:'Argélia',AUT:'Áustria',JOR:'Jordânia',
+    POR:'Portugal',COD:'Congo',UZB:'Uzbequistão',COL:'Colômbia',
+    ENG:'Inglaterra',CRO:'Croácia',GHA:'Gana',PAN:'Panamá',
+    FWC:'FWC Especiais','COCA-COLA':'Coca-Cola'
+  };
+  const GRP_CLR={
+    A:'#1565C0',B:'#6A1B9A',C:'#2E7D32',D:'#AD1457',
+    E:'#E65100',F:'#00838F',G:'#558B2F',H:'#4527A0',
+    I:'#0277BD',J:'#BF360C',K:'#00695C',L:'#6D4C41',ESP:'#F57F17'
+  };
+
+  const totalMiss = countMissing();
+  const totalGot = 980 - totalMiss;
+  const pct = (totalGot/980*100).toFixed(1);
+  const hoje = new Date().toLocaleDateString('pt-BR');
+
+  let rows = '';
+  let anyGroup = false;
+  for(const grp in STATE.missing){
+    let grpRows = '';
+    let grpTotal = 0;
+    for(const team in STATE.missing[grp]){
+      const arr = STATE.missing[grp][team];
+      if(!arr.length) continue;
+      const sorted = [...arr].sort((a,b)=>a-b);
+      const nums = sorted.map(n=>{
+        const esp = (n===1||team==='FWC');
+        return esp ? `<span class="esp">${n}✨</span>` : n;
+      }).join(', ');
+      grpRows += `<tr>
+        <td class="td-grp" style="background:${GRP_CLR[grp]}22;border-left:3px solid ${GRP_CLR[grp]}">
+          <b>${team}</b><br><span class="sub">${NAMES_PT[team]||team}</span>
+        </td>
+        <td class="td-nums">${nums}</td>
+        <td class="td-qt">${arr.length}</td>
+      </tr>`;
+      grpTotal += arr.length;
+    }
+    if(!grpRows) continue;
+    anyGroup = true;
+    rows += `<tr class="grp-hdr">
+      <td colspan="3" style="background:${GRP_CLR[grp]};color:#fff;padding:4px 8px;font-size:11px;font-weight:700;letter-spacing:1px">
+        GRUPO ${grp} — ${grpTotal} faltantes
+      </td>
+    </tr>${grpRows}`;
+  }
+
+  const win = window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="UTF-8">
+<title>Faltantes Copa 2026 — Gabriel & Bernardo</title>
+<style>
+  @page{size:A4;margin:12mm 10mm}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:10px;color:#111}
+  .header{background:#0D1B4B;color:#fff;padding:8px 12px;border-radius:6px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+  .header-title{font-size:14px;font-weight:700;color:#FFB300}
+  .header-sub{font-size:9px;color:rgba(255,255,255,0.7);margin-top:2px}
+  .kpis{display:flex;gap:6px;margin-bottom:8px}
+  .kpi{flex:1;background:#F0F4F8;border-radius:4px;padding:5px 8px;text-align:center;border:1px solid #E0E0E0}
+  .kpi-val{font-size:14px;font-weight:700;color:#0D1B4B}
+  .kpi-lbl{font-size:8px;color:#90A4AE;text-transform:uppercase;letter-spacing:.3px}
+  .kpi.miss .kpi-val{color:#D32F2F}
+  .kpi.got .kpi-val{color:#2E7D32}
+  table{width:100%;border-collapse:collapse;font-size:9px}
+  .grp-hdr td{font-size:10px}
+  .td-grp{padding:4px 6px;width:90px;vertical-align:middle;border-bottom:1px solid #E0E0E0}
+  .td-grp b{font-size:10px}
+  .sub{color:#90A4AE;font-size:8px}
+  .td-nums{padding:4px 6px;border-bottom:1px solid #E0E0E0;line-height:1.6;color:#333}
+  .td-qt{padding:4px 6px;width:30px;text-align:center;border-bottom:1px solid #E0E0E0;font-weight:700;color:#D32F2F}
+  .esp{color:#E65100;font-weight:700}
+  .footer{margin-top:8px;text-align:center;font-size:8px;color:#90A4AE;border-top:1px solid #E0E0E0;padding-top:6px}
+  .regra{background:#FFFDE7;border:1px solid #FFB300;border-radius:4px;padding:5px 10px;margin-bottom:8px;font-size:9px;color:#7B5B00}
+  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head><body>
+<div class="header">
+  <div>
+    <div class="header-title">🏆 Figurinhas Faltantes — Copa do Mundo 2026</div>
+    <div class="header-sub">Gabriel &amp; Bernardo · Panini FIFA WC 2026 · Impresso em ${hoje}</div>
+  </div>
+  <div style="text-align:right;font-size:11px;color:#FFB300;font-weight:700">${pct}% completo</div>
+</div>
+<div class="kpis">
+  <div class="kpi"><div class="kpi-val">980</div><div class="kpi-lbl">Total</div></div>
+  <div class="kpi miss"><div class="kpi-val">${totalMiss}</div><div class="kpi-lbl">Faltantes</div></div>
+  <div class="kpi got"><div class="kpi-val">${totalGot}</div><div class="kpi-lbl">Coladas</div></div>
+</div>
+<div class="regra">✨ <b>Regra especiais:</b> Figurinhas #1 (escudos brilhantes) e FWC são especiais — valem 1 especial ↔ 1 especial  ou  1 especial ↔ 2 normais</div>
+<table>
+  <thead><tr style="background:#E8ECF0">
+    <th style="padding:4px 6px;text-align:left;font-size:9px">Time</th>
+    <th style="padding:4px 6px;text-align:left;font-size:9px">Figurinhas faltantes (✨ = especial)</th>
+    <th style="padding:4px 6px;text-align:center;font-size:9px">Qtd</th>
+  </tr></thead>
+  <tbody>${rows}</tbody>
+</table>
+<div class="footer">✨ = figurinha especial brilhante (escudo #1 ou FWC) · Troca: 1 especial ↔ 1 especial | 1 especial ↔ 2 normais</div>
+</body></html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>win.print(), 500);
+}
+
 buildSelects();buildFilters();updateKPIs();
+checkUrlReserva();
+
+function checkUrlReserva(){
+  const params = new URLSearchParams(window.location.search);
+  const nome = params.get('reserva');
+  const dou = params.get('dou');   // figurinhas que o amigo vai me dar
+  const quero = params.get('quero'); // figurinhas que o amigo quer de mim
+  if(!nome||!dou||!quero) return;
+
+  // Parse figurinhas
+  const parseFigs = str => str.split(',').map(s=>{
+    const match = s.match(/^([A-Z-]+)(\d+)$/);
+    return match ? {team:match[1],num:parseInt(match[2])} : null;
+  }).filter(Boolean);
+
+  const figsDou = parseFigs(dou);
+  const figsQuero = parseFigs(quero);
+
+  // Salvar reserva pendente
+  const reservas = JSON.parse(localStorage.getItem('minhas_reservas_v1')||'[]');
+  const jaExiste = reservas.find(r=>r.nome===nome && r.ts > Date.now()-3600000);
+  if(!jaExiste){
+    reservas.push({
+      id: Date.now().toString(36),
+      nome: decodeURIComponent(nome),
+      ts: Date.now(),
+      status: 'pendente',
+      figsDou,   // amigo me dá
+      figsQuero  // amigo quer de mim (minhas dups)
+    });
+    localStorage.setItem('minhas_reservas_v1', JSON.stringify(reservas));
+  }
+
+  // Limpar URL e ir para aba reservas
+  window.history.replaceState({}, '', window.location.pathname);
+  showToast('🔔 Nova proposta de troca recebida! Veja a aba Reservas.');
+  // highlight tab
+  const tabBtn = document.getElementById('tab-reservas');
+  if(tabBtn){
+    tabBtn.innerHTML = '<i class="ti ti-lock"></i><span>Reservas</span><span class="tab-alert">1</span>';
+  }
+}
+
+function renderReservas(){
+  const reservas = JSON.parse(localStorage.getItem('minhas_reservas_v1')||'[]');
+  const el = document.getElementById('reservas-list');
+  if(!reservas.length){
+    el.innerHTML='<p class="empty">Nenhuma reserva ainda.<br>Quando um amigo enviar o link de proposta pelo WhatsApp, ela aparece aqui!</p>';
+    return;
+  }
+  el.innerHTML = reservas.slice().reverse().map((r,i)=>{
+    const idx = reservas.length-1-i;
+    const statusBadge = r.status==='pendente'
+      ? '<span class="badge-status pend">⏳ Pendente</span>'
+      : r.status==='aprovada'
+      ? '<span class="badge-status aprov">✅ Aprovada</span>'
+      : '<span class="badge-status recus">❌ Recusada</span>';
+
+    const dou = r.figsDou.map(f=>`<b>${f.team} #${f.num}</b>`).join(', ');
+    const quero = r.figsQuero.map(f=>`<b>${f.team} #${f.num}</b>`).join(', ');
+    const data = new Date(r.ts).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+
+    const actions = r.status==='pendente'
+      ? `<div class="reserva-actions">
+          <button class="btn aprovar" onclick="aprovarReserva(${idx})">✅ Aprovar troca</button>
+          <button class="btn recusar" onclick="recusarReserva(${idx})">❌ Recusar</button>
+         </div>`
+      : `<button class="btn sm" onclick="excluirReserva(${idx})" style="color:#D32F2F">🗑 Remover</button>`;
+
+    return `<div class="reserva-card ${r.status}">
+      <div class="reserva-nome">👤 ${r.nome} ${statusBadge} <span style="font-size:10px;color:#90A4AE;font-weight:400">${data}</span></div>
+      <div class="reserva-items">
+        📥 <b>Ele me dá:</b> ${dou}<br>
+        📤 <b>Eu dou a ele:</b> ${quero}
+      </div>
+      ${actions}
+    </div>`;
+  }).join('');
+}
+
+function aprovarReserva(idx){
+  const reservas = JSON.parse(localStorage.getItem('minhas_reservas_v1')||'[]');
+  const r = reservas[idx];
+  if(!r) return;
+  // Marcar figurinhas que ele me dá como recebidas (tirar das faltantes)
+  r.figsDou.forEach(({team,num})=>{
+    for(const grp in STATE.missing){
+      if(STATE.missing[grp][team]?.includes(num)){
+        STATE.missing[grp][team]=STATE.missing[grp][team].filter(n=>n!==num);
+      }
+    }
+  });
+  // Remover das duplicatas as que eu vou dar a ele
+  r.figsQuero.forEach(({team,num})=>{
+    const idx2 = STATE.duplicates.findIndex(d=>d.team===team&&d.num===num);
+    if(idx2>-1) STATE.duplicates.splice(idx2,1);
+  });
+  reservas[idx].status='aprovada';
+  saveState(STATE);
+  localStorage.setItem('minhas_reservas_v1', JSON.stringify(reservas));
+  updateKPIs(); renderReservas(); renderDuplicatas();
+  showToast(`✅ Troca com ${r.nome} aprovada! Álbum atualizado.`);
+}
+
+function recusarReserva(idx){
+  if(!confirm('Recusar essa proposta de troca?')) return;
+  const reservas = JSON.parse(localStorage.getItem('minhas_reservas_v1')||'[]');
+  reservas[idx].status='recusada';
+  localStorage.setItem('minhas_reservas_v1', JSON.stringify(reservas));
+  renderReservas();
+  showToast('Proposta recusada.', true);
+}
+
+function excluirReserva(idx){
+  const reservas = JSON.parse(localStorage.getItem('minhas_reservas_v1')||'[]');
+  reservas.splice(idx,1);
+  localStorage.setItem('minhas_reservas_v1', JSON.stringify(reservas));
+  renderReservas();
+}
 </script>
 </body>
 </html>
