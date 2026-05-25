@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -73,7 +74,7 @@ body{font-family:Arial,sans-serif;background:#F0F4F8;min-height:100vh;padding-bo
 
   <!-- PASSO 1: O QUE EU (GABRIEL/BERNARDO) TENHO PARA DAR -->
   <div class="card">
-    <h3>🔄 O que temos para trocar</h3>
+    <h3>🔄 O que temos para trocar <span id="dup-total-badge" style="background:#0D1B4B;color:#FFB300;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;margin-left:6px">0</span></h3>
     <p class="tip">Essas são nossas figurinhas repetidas disponíveis para troca. Veja se tem alguma que você precisa!</p>
     <div id="dup-grid" class="dup-grid"></div>
   </div>
@@ -120,9 +121,11 @@ body{font-family:Arial,sans-serif;background:#F0F4F8;min-height:100vh;padding-bo
   <!-- COMO FUNCIONA -->
   <div class="card">
     <h3>ℹ️ Como funciona</h3>
-    <div style="background:#FFFDE7;border:1.5px solid #FFB300;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#7B5B00;line-height:1.6">
-      <b>✨ Regra das figurinhas especiais:</b><br>
-      As figurinhas <b>#1 de cada time</b> (escudos brilhantes) e as <b>FWC</b> são especiais.<br>
+    <div style="background:#F0F4F8;border:1.5px solid #BBDEFB;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1A1A2E;line-height:1.8">
+      <b>📋 Regras de troca:</b><br>
+      • 1 normal ↔ 1 normal<br>
+      <span style="border-top:1px solid #E0E0E0;display:block;margin:4px 0"></span>
+      <b style="color:#E65100">✨ Figurinhas especiais</b> — escudos <b>#1✨</b> de cada time e coleção <b>FWC✨</b>:<br>
       • 1 especial ↔ 1 especial<br>
       • 1 especial ↔ 2 normais
     </div>
@@ -149,126 +152,107 @@ body{font-family:Arial,sans-serif;background:#F0F4F8;min-height:100vh;padding-bo
 <script>
 // ── DADOS: duplicatas que Gabriel e Bernardo têm ──────────────────────────
 const MINHAS_DUPLICATAS = [
-  {grp:'I',team:'JPN',num:8},
-  {grp:'I',team:'JPN',num:6},
-  {grp:'B',team:'CAN',num:11},
-  {grp:'B',team:'CAN',num:7},
+  {grp:'J',team:'ALG',num:13},
+  {grp:'D',team:'AUS',num:1},
+  {grp:'L',team:'CRO',num:1},
+  {grp:'K',team:'POR',num:1},
+  {grp:'J',team:'JOR',num:1},
+  {grp:'E',team:'CUW',num:1},
+  {grp:'G',team:'IRN',num:8},
+  {grp:'C',team:'SCO',num:2},
+  {grp:'D',team:'PAR',num:18},
+  {grp:'K',team:'COL',num:11},
   {grp:'B',team:'SUI',num:12},
+  {grp:'G',team:'EGY',num:6},
   {grp:'B',team:'SUI',num:5},
-  {grp:'C',team:'SCO',num:4},
+  {grp:'E',team:'ECU',num:3},
+  {grp:'L',team:'ENG',num:8},
+  {grp:'A',team:'RSA',num:10},
+  {grp:'J',team:'JOR',num:2},
+  {grp:'J',team:'JOR',num:10},
+  {grp:'K',team:'POR',num:5},
   {grp:'C',team:'SCO',num:4},
   {grp:'C',team:'SCO',num:7},
   {grp:'C',team:'SCO',num:3},
-  {grp:'I',team:'SEN',num:16},
-  {grp:'I',team:'SEN',num:6},
-  {grp:'I',team:'SEN',num:9},
-  {grp:'I',team:'SEN',num:14},
-  {grp:'K',team:'COL',num:11},
-  {grp:'H',team:'ESP',num:18},
-  {grp:'G',team:'EGY',num:3},
-  {grp:'A',team:'RSA',num:10},
-  {grp:'E',team:'CUW',num:18},
-  {grp:'J',team:'JOR',num:10},
-  {grp:'G',team:'BEL',num:17},
-  {grp:'J',team:'ARG',num:2},
+  {grp:'C',team:'SCO',num:4},
   {grp:'F',team:'NED',num:18},
-  {grp:'B',team:'QAT',num:12},
-  {grp:'I',team:'FRA',num:7},
-  {grp:'A',team:'MEX',num:7},
-  {grp:'B',team:'CAN',num:16},
-  {grp:'B',team:'CAN',num:20},
-  {grp:'J',team:'JOR',num:2},
-  {grp:'D',team:'PAR',num:18},
-  {grp:'C',team:'HAI',num:10},
-  {grp:'G',team:'BEL',num:4},
-  {grp:'E',team:'GER',num:19},
-  {grp:'G',team:'IRN',num:8},
-  {grp:'L',team:'GHA',num:12},
-  {grp:'K',team:'POR',num:5},
-  {grp:'D',team:'AUS',num:10},
-  {grp:'L',team:'PAN',num:4},
-  {grp:'H',team:'KSA',num:17},
-  {grp:'H',team:'ESP',num:2},
-  {grp:'J',team:'ARG',num:18},
-  {grp:'B',team:'QAT',num:10},
-  {grp:'L',team:'PAN',num:14},
-  {grp:'L',team:'PAN',num:12},
-  {grp:'L',team:'PAN',num:8},
-  {grp:'G',team:'EGY',num:6},
-  {grp:'E',team:'CIV',num:14},
-  {grp:'E',team:'CIV',num:11},
-  {grp:'A',team:'RSA',num:4},
-  {grp:'A',team:'RSA',num:4},
-  {grp:'E',team:'CUW',num:9},
-  {grp:'E',team:'CUW',num:6},
-  {grp:'J',team:'ALG',num:16},
-  {grp:'D',team:'AUS',num:1},
-  {grp:'C',team:'BRA',num:2},
-  {grp:'C',team:'BRA',num:9},
-  {grp:'I',team:'FRA',num:20},
-  {grp:'I',team:'FRA',num:7},
-  {grp:'H',team:'ESP',num:2},
-  {grp:'H',team:'ESP',num:6},
-  {grp:'K',team:'COL',num:3},
-  {grp:'K',team:'COL',num:16},
-  {grp:'K',team:'COL',num:20},
-  {grp:'I',team:'NOR',num:16},
   {grp:'I',team:'NOR',num:12},
-  {grp:'I',team:'JPN',num:12},
-  {grp:'K',team:'POR',num:1},
-  {grp:'E',team:'CUW',num:1},
-  {grp:'L',team:'PAN',num:6},
-  {grp:'B',team:'CAN',num:12},
-  {grp:'J',team:'ARG',num:15},
-  {grp:'C',team:'SCO',num:9},
-  {grp:'J',team:'AUT',num:9},
-  {grp:'J',team:'AUT',num:3},
-  {grp:'L',team:'GHA',num:2},
-  {grp:'L',team:'ENG',num:8},
-  {grp:'E',team:'CUW',num:14},
-  {grp:'C',team:'SCO',num:2},
-  {grp:'C',team:'HAI',num:3},
-  {grp:'J',team:'JOR',num:1},
+  {grp:'H',team:'KSA',num:7},
+  {grp:'H',team:'KSA',num:17},
+  {grp:'H',team:'KSA',num:12},
+  {grp:'I',team:'SEN',num:20},
   {grp:'J',team:'ALG',num:7},
-  {grp:'J',team:'ALG',num:11},
-  {grp:'J',team:'ALG',num:20},
-  {grp:'J',team:'ARG',num:9},
-  {grp:'K',team:'POR',num:12},
+  {grp:'G',team:'BEL',num:4},
+  {grp:'J',team:'ALG',num:16},
+  {grp:'E',team:'KOR',num:10},
+  {grp:'H',team:'ESP',num:2},
+  {grp:'J',team:'AUT',num:3},
   {grp:'A',team:'MEX',num:12},
   {grp:'G',team:'BEL',num:7},
-  {grp:'C',team:'MAR',num:10},
+  {grp:'K',team:'COL',num:3},
+  {grp:'E',team:'CIV',num:11},
+  {grp:'I',team:'JPN',num:8},
+  {grp:'B',team:'QAT',num:12},
+  {grp:'A',team:'MEX',num:7},
   {grp:'D',team:'AUS',num:17},
+  {grp:'L',team:'PAN',num:4},
+  {grp:'J',team:'ARG',num:9},
+  {grp:'J',team:'ALG',num:20},
+  {grp:'C',team:'SCO',num:9},
+  {grp:'E',team:'CUW',num:14},
+  {grp:'E',team:'CUW',num:9},
+  {grp:'K',team:'COL',num:16},
+  {grp:'C',team:'HAI',num:10},
+  {grp:'K',team:'POR',num:12},
+  {grp:'I',team:'JPN',num:6},
   {grp:'G',team:'NZL',num:10},
+  {grp:'I',team:'NOR',num:16},
+  {grp:'E',team:'CUW',num:6},
+  {grp:'J',team:'ARG',num:2},
+  {grp:'I',team:'SEN',num:16},
+  {grp:'I',team:'SEN',num:6},
+  {grp:'I',team:'SEN',num:14},
+  {grp:'I',team:'SEN',num:9},
+  {grp:'B',team:'CAN',num:16},
+  {grp:'B',team:'CAN',num:20},
+  {grp:'I',team:'FRA',num:20},
+  {grp:'E',team:'GER',num:19},
+  {grp:'A',team:'RSA',num:4},
   {grp:'G',team:'IRN',num:8},
-  {grp:'L',team:'CRO',num:1},
-  {grp:'I',team:'SEN',num:20},
-  {grp:'H',team:'KSA',num:12},
-  {grp:'H',team:'KSA',num:17},
-  {grp:'H',team:'KSA',num:7},
-  {grp:'E',team:'KOR',num:6},
-  {grp:'E',team:'KOR',num:10},
-  {grp:'E',team:'KOR',num:4},
+  {grp:'E',team:'CIV',num:6},
   {grp:'L',team:'GHA',num:17},
-  {grp:'L',team:'GHA',num:7},
   {grp:'B',team:'QAT',num:10},
-  {grp:'B',team:'QAT',num:15}
+  {grp:'J',team:'ARG',num:18},
+  {grp:'B',team:'QAT',num:14},
+  {grp:'H',team:'ESP',num:2},
+  {grp:'A',team:'RSA',num:4},
+  {grp:'E',team:'KOR',num:4},
+  {grp:'B',team:'QAT',num:15},
+  {grp:'B',team:'QAT',num:10},
+  {grp:'E',team:'CIV',num:14},
+  {grp:'L',team:'PAN',num:8},
+  {grp:'L',team:'PAN',num:12},
+  {grp:'L',team:'PAN',num:6},
+  {grp:'J',team:'ALG',num:11},
+  {grp:'L',team:'PAN',num:14},
+  {grp:'I',team:'FRA',num:7}
 ];
 
 // ── DADOS: figurinhas que ainda faltam para Gabriel e Bernardo ────────────
 const MINHAS_FALTANTES = {
   A:{MEX:[1,5,9,13,20],RSA:[1,7,9,11,13,14,15,17,18],KOR:[14,17,18,19],CZE:[6,9,12,13,14,16,18,19,20]},
   B:{CAN:[4,9,10,15,17,18,19],BIH:[3,4,7,8,11,13,16,17,19,20],QAT:[1,5,8,13,16,17,20],SUI:[4,6,10,15,17,18,19,20]},
-  C:{BRA:[1,3,11,20],MAR:[1,5,9,12,16,18],HAI:[1,4,7,8,11,12,13,14,16],SCO:[20]},
+  C:{BRA:[1,3,11,20],MAR:[1,5,9,12,16,18],HAI:[1,4,7,8,11,12,14,16],SCO:[20]},
   D:{USA:[1,6,13,17,18,19,20],PAR:[11,16,17,19],AUS:[3,6,19,20],TUR:[2,4,5,6,7,8,9,11,12,13]},
   E:{GER:[1,3,4,8,15,16,20],CUW:[3,4,7,8,11,16,20],CIV:[1,2,3,5,7,9,12,13,17,20],ECU:[1,5,7,9,13,15]},
   F:{NED:[2,3,6,7,8,11,20],JPN:[1,5,9,10,18],SWE:[7,8,10,12,16,17,20],TUN:[3,4,5,6,8,12,17,20]},
   G:{BEL:[1,2,5,6,9,12,13,18],EGY:[4,7,8,13,16,18],IRN:[2,6,7,9,10,11,14,15,16,19],NZL:[4,7,8,11,15,16,17]},
-  H:{ESP:[3,12,15,17,20],CPV:[3,7,10,11,15,16,20],KSA:[2,4,6,10,16],URU:[3,4,5,10,12,13,19]},
+  H:{ESP:[3,12,15,17,20],CPV:[3,7,10,11,15,16,20],KSA:[2,4,6,10,16],URU:[3,4,5,10,13,19]},
   I:{FRA:[2,5,8,9,12,19],SEN:[1,12,17],IRQ:[1,2,5,6,8,9,10,15,18,19],NOR:[1,3,5,20]},
-  J:{ARG:[1,3,4,17],ALG:[3,5,10,15,18],AUT:[1,4,7,8,11,12,16,17,20],JOR:[3,4,5,7,8,9,11,12,14,16,17,18,20]},
-  K:{POR:[2,4,11,15,16,19],COD:[2,4,5,6,7,9,13,14,18],UZB:[1,2,3,8,12,18],COL:[1,2,6,8,9,13,15]},
-  L:{ENG:[15,18],CRO:[2,3,5,6,7,9,15,19],GHA:[13,19],PAN:[13,15,19,20]},
-  ESP:{'FWC':[1,4,6,10,14,17,18,19],'COCA-COLA':[1,4,5,8,9,10,11,13,14]}
+  J:{ARG:[3,4,17],ALG:[3,5,10,15,18],AUT:[1,4,7,11,12,17,20],JOR:[4,5,7,8,9,11,12,14,16,17,18,20]},
+  K:{POR:[2,11,15,16,19],COD:[4,5,6,9,13,14,18],UZB:[3,18],COL:[1,2,6,8,13,15]},
+  L:{ENG:[15,18],CRO:[2,3,5,6,7,9,15,19],GHA:[13,19],PAN:[15,19,20]},
+  ESP:{FWC:[1,6,10,17,18,19],'COCA-COLA':[1,4,5,8,9,10,11,13,14]}
 };
 
 const NAMES={
@@ -321,6 +305,10 @@ function getDisponivel(){
 }
 
 function renderDups(){
+  // Atualiza badge de total
+  const totalDisp = MINHAS_DUPLICATAS.length;
+  const badge = document.getElementById('dup-total-badge');
+  if(badge) badge.textContent = totalDisp + ' fig.';
   const disp = getDisponivel();
   const byTeam = {};
   MINHAS_DUPLICATAS.forEach(d=>{
@@ -336,14 +324,15 @@ function renderDups(){
     const numsStr = dispNums.map(n=>{
       const total = cnt[n];
       const disponivel = disp[`${grp}|${team}|${n}`]||0;
-      if(disponivel===0) return `<span style="color:#BDBDBD;text-decoration:line-through">${n}</span>`;
-      if(total>1) return `<b>${n}</b><span style="color:#2E7D32;font-size:10px">(${disponivel}disp)</span>`;
-      return `<b>${n}</b>`;
+      const esp = isSpecial(team, n);
+      const label = esp ? `${n}✨` : `${n}`;
+      if(disponivel===0) return `<span style="color:#BDBDBD;text-decoration:line-through">${label}</span>`;
+      if(total>1) return `<b>${label}</b><span style="color:#2E7D32;font-size:10px">(${disponivel}disp)</span>`;
+      return `<b>${label}</b>`;
     }).join(', ');
     const temDisp = dispNums.some(n=>(disp[`${grp}|${team}|${n}`]||0)>0);
-    const hasSpecial = dispNums.some(n=>isSpecial(team,n)&&(disp[`${grp}|${team}|${n}`]||0)>0);
-    return `<div class="dup-card" style="${!temDisp?'opacity:0.5':''}${hasSpecial?';border:1.5px solid #FFB300;background:#FFFDE7':''}">
-      <div class="dup-card-team"><span style="color:#607D8B;font-size:10px">G.${grp}</span> ${team}${hasSpecial?' <span style="font-size:11px">✨</span>':''}</div>
+    return `<div class="dup-card" style="${!temDisp?'opacity:0.5':''}">
+      <div class="dup-card-team"><span style="color:#607D8B;font-size:10px">G.${grp}</span> ${team}</div>
       <div class="dup-card-nums" style="font-size:11px">${numsStr}</div>
       ${!temDisp?'<div style="font-size:10px;color:#D32F2F;margin-top:2px">⛔ Esgotado</div>':''}
     </div>`;
