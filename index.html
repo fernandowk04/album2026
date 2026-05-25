@@ -109,14 +109,14 @@ tr:hover td{background:#F5F9FF}
 
   <div class="kpis">
     <div class="kpi"><div class="kpi-val" id="k-total">980</div><div class="kpi-lbl">Total</div></div>
-    <div class="kpi miss"><div class="kpi-val" id="k-miss">331</div><div class="kpi-lbl">Faltantes</div></div>
-    <div class="kpi got"><div class="kpi-val" id="k-got">649</div><div class="kpi-lbl">Coladas</div></div>
-    <div class="kpi dup"><div class="kpi-val" id="k-dup">103</div><div class="kpi-lbl">Duplicatas</div></div>
+    <div class="kpi miss"><div class="kpi-val" id="k-miss">314</div><div class="kpi-lbl">Faltantes</div></div>
+    <div class="kpi got"><div class="kpi-val" id="k-got">666</div><div class="kpi-lbl">Coladas</div></div>
+    <div class="kpi dup"><div class="kpi-val" id="k-dup">84</div><div class="kpi-lbl">Duplicatas</div></div>
   </div>
 
   <div class="prog-wrap">
-    <div class="prog-bar"><div class="prog-fill" id="prog" style="width:66.2%"></div></div>
-    <div class="prog-txt" id="prog-txt">66.2% completo · 649 de 980 figurinhas</div>
+    <div class="prog-bar"><div class="prog-fill" id="prog" style="width:68.0%"></div></div>
+    <div class="prog-txt" id="prog-txt">68.0% completo · 666 de 980 figurinhas</div>
   </div>
 
   <div id="toast" class="toast"></div>
@@ -233,17 +233,17 @@ const TOTAL = 980;
 const INITIAL = {
   A:{MEX:[1,5,9,13,20],RSA:[1,7,9,11,13,14,15,17,18],KOR:[14,17,18,19],CZE:[6,9,12,13,14,16,18,19,20]},
   B:{CAN:[4,9,10,15,17,18,19],BIH:[3,4,7,8,11,13,16,17,19,20],QAT:[1,5,8,13,16,17,20],SUI:[4,6,10,15,17,18,19,20]},
-  C:{BRA:[1,3,11,20],MAR:[1,5,9,12,16,18],HAI:[1,4,7,8,11,12,13,14,16],SCO:[20]},
+  C:{BRA:[1,3,11,20],MAR:[1,5,9,12,16,18],HAI:[1,4,7,8,11,12,14,16],SCO:[20]},
   D:{USA:[1,6,13,17,18,19,20],PAR:[11,16,17,19],AUS:[3,6,19,20],TUR:[2,4,5,6,7,8,9,11,12,13]},
   E:{GER:[1,3,4,8,15,16,20],CUW:[3,4,7,8,11,16,20],CIV:[1,2,3,5,7,9,12,13,17,20],ECU:[1,5,7,9,13,15]},
   F:{NED:[2,3,6,7,8,11,20],JPN:[1,5,9,10,18],SWE:[7,8,10,12,16,17,20],TUN:[3,4,5,6,8,12,17,20]},
   G:{BEL:[1,2,5,6,9,12,13,18],EGY:[4,7,8,13,16,18],IRN:[2,6,7,9,10,11,14,15,16,19],NZL:[4,7,8,11,15,16,17]},
-  H:{ESP:[3,12,15,17,20],CPV:[3,7,10,11,15,16,20],KSA:[2,4,6,10,16],URU:[3,4,5,10,12,13,19]},
+  H:{ESP:[3,12,15,17,20],CPV:[3,7,10,11,15,16,20],KSA:[2,4,6,10,16],URU:[3,4,5,10,13,19]},
   I:{FRA:[2,5,8,9,12,19],SEN:[1,12,17],IRQ:[1,2,5,6,8,9,10,15,18,19],NOR:[1,3,5,20]},
-  J:{ARG:[1,3,4,17],ALG:[3,5,10,15,18],AUT:[1,4,7,8,11,12,16,17,20],JOR:[3,4,5,7,8,9,11,12,14,16,17,18,20]},
-  K:{POR:[2,4,11,15,16,19],COD:[2,4,5,6,7,9,13,14,18],UZB:[1,2,3,8,12,18],COL:[1,2,6,8,9,13,15]},
-  L:{ENG:[15,18],CRO:[2,3,5,6,7,9,15,19],GHA:[13,19],PAN:[13,15,19,20]},
-  ESP:{'FWC':[1,4,6,10,14,17,18,19],'COCA-COLA':[1,4,5,8,9,10,11,13,14]}
+  J:{ARG:[3,4,17],ALG:[3,5,10,15,18],AUT:[1,4,7,11,12,17,20],JOR:[4,5,7,8,9,11,12,14,16,17,18,20]},
+  K:{POR:[2,11,15,16,19],COD:[4,5,6,9,13,14,18],UZB:[3,18],COL:[1,2,6,8,13,15]},
+  L:{ENG:[15,18],CRO:[2,3,5,6,7,9,15,19],GHA:[13,19],PAN:[15,19,20]},
+  ESP:{FWC:[1,6,10,17,18,19],'COCA-COLA':[1,4,5,8,9,10,11,13,14]}
 };
 const NAMES={
   MEX:'México',RSA:'África do Sul',KOR:'Coreia do Sul',CZE:'Rep. Checa',
@@ -268,12 +268,12 @@ const GRP_COLORS={
 const BAR_COLORS=['#1565C0','#2E7D32','#D32F2F','#6A1B9A','#E65100','#00838F','#558B2F','#AD1457','#4527A0','#0277BD','#BF360C','#00695C'];
 
 function loadState(){
-  try{const s=localStorage.getItem('album2026_v5');if(s)return JSON.parse(s);}catch(e){}
-  const st={missing:{},duplicates:[{grp:'I',team:'JPN',num:8},{grp:'I',team:'JPN',num:6},{grp:'B',team:'CAN',num:11},{grp:'B',team:'CAN',num:7},{grp:'B',team:'SUI',num:12},{grp:'B',team:'SUI',num:5},{grp:'C',team:'SCO',num:4},{grp:'C',team:'SCO',num:4},{grp:'C',team:'SCO',num:7},{grp:'C',team:'SCO',num:3},{grp:'I',team:'SEN',num:16},{grp:'I',team:'SEN',num:6},{grp:'I',team:'SEN',num:9},{grp:'I',team:'SEN',num:14},{grp:'K',team:'COL',num:11},{grp:'H',team:'ESP',num:18},{grp:'G',team:'EGY',num:3},{grp:'A',team:'RSA',num:10},{grp:'E',team:'CUW',num:18},{grp:'J',team:'JOR',num:10},{grp:'G',team:'BEL',num:17},{grp:'J',team:'ARG',num:2},{grp:'F',team:'NED',num:18},{grp:'B',team:'QAT',num:12},{grp:'I',team:'FRA',num:7},{grp:'A',team:'MEX',num:7},{grp:'B',team:'CAN',num:16},{grp:'B',team:'CAN',num:20},{grp:'J',team:'JOR',num:2},{grp:'D',team:'PAR',num:18},{grp:'C',team:'HAI',num:10},{grp:'G',team:'BEL',num:4},{grp:'E',team:'GER',num:19},{grp:'G',team:'IRN',num:8},{grp:'L',team:'GHA',num:12},{grp:'K',team:'POR',num:5},{grp:'D',team:'AUS',num:10},{grp:'L',team:'PAN',num:4},{grp:'H',team:'KSA',num:17},{grp:'H',team:'ESP',num:2},{grp:'J',team:'ARG',num:18},{grp:'B',team:'QAT',num:10},{grp:'L',team:'PAN',num:14},{grp:'L',team:'PAN',num:12},{grp:'L',team:'PAN',num:8},{grp:'G',team:'EGY',num:6},{grp:'E',team:'CIV',num:14},{grp:'E',team:'CIV',num:11},{grp:'A',team:'RSA',num:4},{grp:'A',team:'RSA',num:4},{grp:'E',team:'CUW',num:9},{grp:'E',team:'CUW',num:6},{grp:'J',team:'ALG',num:16},{grp:'D',team:'AUS',num:1},{grp:'C',team:'BRA',num:2},{grp:'C',team:'BRA',num:9},{grp:'I',team:'FRA',num:20},{grp:'I',team:'FRA',num:7},{grp:'H',team:'ESP',num:2},{grp:'H',team:'ESP',num:6},{grp:'K',team:'COL',num:3},{grp:'K',team:'COL',num:16},{grp:'K',team:'COL',num:20},{grp:'I',team:'NOR',num:16},{grp:'I',team:'NOR',num:12},{grp:'I',team:'JPN',num:12},{grp:'K',team:'POR',num:1},{grp:'E',team:'CUW',num:1},{grp:'L',team:'PAN',num:6},{grp:'B',team:'CAN',num:12},{grp:'J',team:'ARG',num:15},{grp:'C',team:'SCO',num:9},{grp:'J',team:'AUT',num:9},{grp:'J',team:'AUT',num:3},{grp:'L',team:'GHA',num:2},{grp:'L',team:'ENG',num:8},{grp:'E',team:'CUW',num:14},{grp:'C',team:'SCO',num:2},{grp:'C',team:'HAI',num:3},{grp:'J',team:'JOR',num:1},{grp:'J',team:'ALG',num:7},{grp:'J',team:'ALG',num:11},{grp:'J',team:'ALG',num:20},{grp:'J',team:'ARG',num:9},{grp:'K',team:'POR',num:12},{grp:'A',team:'MEX',num:12},{grp:'G',team:'BEL',num:7},{grp:'C',team:'MAR',num:10},{grp:'D',team:'AUS',num:17},{grp:'G',team:'NZL',num:10},{grp:'G',team:'IRN',num:8},{grp:'L',team:'CRO',num:1},{grp:'I',team:'SEN',num:20},{grp:'H',team:'KSA',num:12},{grp:'H',team:'KSA',num:17},{grp:'H',team:'KSA',num:7},{grp:'E',team:'KOR',num:6},{grp:'E',team:'KOR',num:10},{grp:'E',team:'KOR',num:4},{grp:'L',team:'GHA',num:17},{grp:'L',team:'GHA',num:7},{grp:'B',team:'QAT',num:10},{grp:'B',team:'QAT',num:15}]};
+  try{const s=localStorage.getItem('album2026_v6');if(s)return JSON.parse(s);}catch(e){}
+  const st={missing:{},duplicates:[{grp:'J',team:'ALG',num:13},{grp:'D',team:'AUS',num:1},{grp:'L',team:'CRO',num:1},{grp:'K',team:'POR',num:1},{grp:'J',team:'JOR',num:1},{grp:'E',team:'CUW',num:1},{grp:'G',team:'IRN',num:8},{grp:'C',team:'SCO',num:2},{grp:'D',team:'PAR',num:18},{grp:'K',team:'COL',num:11},{grp:'B',team:'SUI',num:12},{grp:'G',team:'EGY',num:6},{grp:'B',team:'SUI',num:5},{grp:'E',team:'ECU',num:3},{grp:'L',team:'ENG',num:8},{grp:'A',team:'RSA',num:10},{grp:'J',team:'JOR',num:2},{grp:'J',team:'JOR',num:10},{grp:'K',team:'POR',num:5},{grp:'C',team:'SCO',num:4},{grp:'C',team:'SCO',num:7},{grp:'C',team:'SCO',num:3},{grp:'C',team:'SCO',num:4},{grp:'F',team:'NED',num:18},{grp:'I',team:'NOR',num:12},{grp:'H',team:'KSA',num:7},{grp:'H',team:'KSA',num:17},{grp:'H',team:'KSA',num:12},{grp:'I',team:'SEN',num:20},{grp:'J',team:'ALG',num:7},{grp:'G',team:'BEL',num:4},{grp:'J',team:'ALG',num:16},{grp:'E',team:'KOR',num:10},{grp:'H',team:'ESP',num:2},{grp:'J',team:'AUT',num:3},{grp:'A',team:'MEX',num:12},{grp:'G',team:'BEL',num:7},{grp:'K',team:'COL',num:3},{grp:'E',team:'CIV',num:11},{grp:'I',team:'JPN',num:8},{grp:'B',team:'QAT',num:12},{grp:'A',team:'MEX',num:7},{grp:'D',team:'AUS',num:17},{grp:'L',team:'PAN',num:4},{grp:'J',team:'ARG',num:9},{grp:'J',team:'ALG',num:20},{grp:'C',team:'SCO',num:9},{grp:'E',team:'CUW',num:14},{grp:'E',team:'CUW',num:9},{grp:'K',team:'COL',num:16},{grp:'C',team:'HAI',num:10},{grp:'K',team:'POR',num:12},{grp:'I',team:'JPN',num:6},{grp:'G',team:'NZL',num:10},{grp:'I',team:'NOR',num:16},{grp:'E',team:'CUW',num:6},{grp:'J',team:'ARG',num:2},{grp:'I',team:'SEN',num:16},{grp:'I',team:'SEN',num:6},{grp:'I',team:'SEN',num:14},{grp:'I',team:'SEN',num:9},{grp:'B',team:'CAN',num:16},{grp:'B',team:'CAN',num:20},{grp:'I',team:'FRA',num:20},{grp:'E',team:'GER',num:19},{grp:'A',team:'RSA',num:4},{grp:'G',team:'IRN',num:8},{grp:'E',team:'CIV',num:6},{grp:'L',team:'GHA',num:17},{grp:'B',team:'QAT',num:10},{grp:'J',team:'ARG',num:18},{grp:'B',team:'QAT',num:14},{grp:'H',team:'ESP',num:2},{grp:'A',team:'RSA',num:4},{grp:'E',team:'KOR',num:4},{grp:'B',team:'QAT',num:15},{grp:'B',team:'QAT',num:10},{grp:'E',team:'CIV',num:14},{grp:'L',team:'PAN',num:8},{grp:'L',team:'PAN',num:12},{grp:'L',team:'PAN',num:6},{grp:'J',team:'ALG',num:11},{grp:'L',team:'PAN',num:14},{grp:'I',team:'FRA',num:7}]};
   for(const g in INITIAL){st.missing[g]={};for(const t in INITIAL[g])st.missing[g][t]=[...INITIAL[g][t]];}
   return st;
 }
-function saveState(st){try{localStorage.setItem('album2026_v5',JSON.stringify(st));}catch(e){}}
+function saveState(st){try{localStorage.setItem('album2026_v6',JSON.stringify(st));}catch(e){}}
 let STATE=loadState();
 
 function countMissing(){let n=0;for(const g in STATE.missing)for(const t in STATE.missing[g])n+=STATE.missing[g][t].length;return n;}
@@ -437,7 +437,7 @@ function importData(e){
 }
 function resetAll(){
   if(!confirm('Tem certeza? Isso apaga todo o progresso e volta para a lista inicial!'))return;
-  localStorage.removeItem('album2026_v5');STATE=loadState();
+  localStorage.removeItem('album2026_v6');STATE=loadState();
   updateKPIs();buildSelects();renderFaltantes();renderGrupos();renderDuplicatas();
   showToast('Progresso resetado.',true);
 }
