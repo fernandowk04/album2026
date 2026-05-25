@@ -108,14 +108,30 @@ body{font-family:Arial,sans-serif;background:#F0F4F8;min-height:100vh;padding-bo
     </div>
   </div>
 
-  <!-- PASSO 3: RESULTADO -->
+  <!-- PASSO 3: O QUE EU PRECISO DELE -->
   <div class="card hidden" id="result-card">
-    <h3>🎯 Trocas possíveis</h3>
+    <h3>🎯 Figurinhas que preciso de você</h3>
     <div id="result-content"></div>
-    <div id="wpp-wrap" class="hidden">
-      <div class="wpp-box" id="wpp-msg"></div>
-      <button class="btn green" onclick="sendWpp()">📲 Enviar proposta pelo WhatsApp</button>
+  </div>
+
+  <!-- PASSO 4: O QUE ELE QUER DE MIM -->
+  <div class="card hidden" id="escolha-card">
+    <h3>🛒 Agora escolha o que quer das nossas repetidas</h3>
+    <p class="tip" id="escolha-tip"></p>
+    <div id="escolha-grid" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
+    <div id="escolha-selecionadas" class="hidden" style="margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;color:#0D1B4B;margin-bottom:4px">Selecionadas:</div>
+      <div id="sel-chips" style="display:flex;flex-wrap:wrap;gap:4px"></div>
     </div>
+    <button class="btn gold" onclick="confirmarEscolha()" style="width:auto">✅ Confirmar proposta</button>
+  </div>
+
+  <!-- PASSO 5: PROPOSTA FINAL -->
+  <div class="card hidden" id="proposta-card">
+    <h3>📋 Proposta de troca</h3>
+    <div id="proposta-content"></div>
+    <div class="wpp-box" id="wpp-msg" style="margin-top:10px"></div>
+    <button class="btn green" onclick="sendWpp()" style="margin-top:8px">📲 Enviar proposta pelo WhatsApp</button>
   </div>
 
   <!-- COMO FUNCIONA -->
@@ -411,136 +427,198 @@ function clearAdded(){
 function calcMatches(){
   const card = document.getElementById('result-card');
   const content = document.getElementById('result-content');
-  const wppWrap = document.getElementById('wpp-wrap');
 
   if(!amigoTem.length){card.classList.add('hidden');return;}
-  card.classList.remove('hidden');
 
-  // O que o amigo pode ME DAR (que está nas minhas faltantes)
+  // Figurinhas que o amigo pode me dar (que estão nas minhas faltantes)
   const euRecebo = amigoTem.filter(({grp,team,num})=>{
     return MINHAS_FALTANTES[grp]?.[team]?.includes(num);
   });
 
-  // O que EU posso DAR — usando disponibilidade real (com reservas)
-  const dupDisp = getDisponivel();
+  card.classList.remove('hidden');
 
   if(!euRecebo.length){
     content.innerHTML = `<div class="result-box none">
       <div class="result-title none">😕 Nenhuma troca possível por enquanto</div>
       <p style="font-size:12px;color:#607D8B;margin-top:6px">
-        As figurinhas que você selecionou já temos no álbum ou não estão na nossa lista de faltantes.<br><br>
-        Tente selecionar outros times e números!
+        As figurinhas que você selecionou já temos no álbum ou não precisamos.<br>Tente selecionar outros times e números!
       </p>
     </div>`;
-    wppWrap.classList.add('hidden');
+    document.getElementById('escolha-card').classList.add('hidden');
+    document.getElementById('proposta-card').classList.add('hidden');
     return;
   }
 
-  // Monta proposta usando disponibilidade real
-  const dispCopy = {...dupDisp};
-  const dispKeys = Object.keys(dispCopy).filter(k=>dispCopy[k]>0);
-  const propostas = euRecebo.map(fig=>{
-    const chave = dispKeys.find(k=>dispCopy[k]>0);
-    if(chave) dispCopy[chave]--;
-    const [dg,dt,dn] = chave ? chave.split('|') : ['?','?','?'];
-    return {
-      euRecebo: fig,
-      euDou: chave ? {grp:dg,team:dt,num:parseInt(dn)} : null
-    };
-  });
-
-  // Verifica se tem estoque para todas
-  const semEstoque = propostas.filter(p=>!p.euDou);
-
-  let resultHtml = `<div class="result-box">
-    <div class="result-title">🎉 ${euRecebo.length} troca(s) possível(is)!</div>`;
-
-  // Regra especial: ✨ especial (num=1 ou FWC) vale por 1 especial OU 2 normais
-  const regrasEsp = [];
-  propostas.forEach(({euRecebo:r,euDou:d})=>{
-    const esgotado = !d;
-    const receboEsp = isSpecial(r.team, r.num);
-    const douEsp = d && isSpecial(d.team, d.num);
-    let regraLabel = '';
-    if(receboEsp && !douEsp && d){
-      // amigo me dá especial, eu dou normal — preciso dar 2 normais
-      // pegar mais uma dup normal disponível
-      const extra = Object.keys(dispCopy).find(k=>dispCopy[k]>0 && !isSpecial(k.split('|')[1], parseInt(k.split('|')[2])));
-      if(extra){
-        dispCopy[extra]--;
-        const [eg,et,en] = extra.split('|');
-        regraLabel = ` <span style="font-size:10px;color:#E65100">✨ Especial! Eu te dou mais: ${et} #${en}</span>`;
-        regrasEsp.push({team:et,num:parseInt(en),grp:eg});
-      } else {
-        regraLabel = ` <span style="font-size:10px;color:#E65100">✨ Especial! (sem 2ª normal disponível)</span>`;
-      }
-    } else if(receboEsp && douEsp){
-      regraLabel = ` <span style="font-size:10px;color:#FFB300">✨ Especial por especial ✅</span>`;
-    }
-    resultHtml += `<div class="match-row" style="${esgotado?'opacity:0.5':''}">
-      <span>Você me dá: <span class="match-get">${receboEsp?'✨ ':''}G.${r.grp} ${r.team} #${r.num}</span></span>
-      <span class="arrow">⇄</span>
-      <span>Eu te dou: <span class="match-give">${d?`${douEsp?'✨ ':''}G.${d.grp} ${d.team} #${d.num}`:'<span style="color:#D32F2F">⛔ Sem estoque</span>'}</span>${regraLabel}</span>
+  // Mostrar o que eu preciso dele
+  let html2 = `<div class="result-box">
+    <div class="result-title">🎉 Tenho interesse em ${euRecebo.length} figurinha(s) suas!</div>`;
+  euRecebo.forEach(r=>{
+    const esp = isSpecial(r.team, r.num);
+    html2 += `<div class="match-row">
+      <span>${esp?'✨ ':''}<span class="match-get">G.${r.grp} ${r.team} #${r.num}</span></span>
+      ${esp?'<span style="font-size:10px;color:#E65100">especial — vale 2 normais ou 1 especial</span>':''}
     </div>`;
   });
-  if(semEstoque.length){
-    resultHtml += `<p style="font-size:11px;color:#E65100;margin-top:8px">⚠️ ${semEstoque.length} figurinha(s) sem estoque disponível no momento — pode haver outra reserva ativa.</p>`;
+  html2 += `</div>`;
+  content.innerHTML = html2;
+
+  // Calcular quantas duplicatas minhas o amigo pode pedir
+  // Especial = vale 2 normais
+  let creditos = 0;
+  euRecebo.forEach(r => { creditos += isSpecial(r.team,r.num) ? 2 : 1; });
+
+  // Mostrar tela de escolha
+  mostrarEscolha(creditos, euRecebo);
+}
+
+let euReceberFigs = [];
+let escolhidas = [];
+let maxEscolha = 0;
+
+function mostrarEscolha(creditos, euRecebo){
+  euReceberFigs = euRecebo;
+  maxEscolha = creditos;
+  escolhidas = [];
+
+  const card = document.getElementById('escolha-card');
+  const tip = document.getElementById('escolha-tip');
+  const grid = document.getElementById('escolha-grid');
+
+  tip.textContent = `Você pode escolher até ${creditos} figurinha(s) das nossas repetidas (${creditos > euRecebo.length ? creditos + ' créditos pois tem especial' : ''}).`;
+  card.classList.remove('hidden');
+  document.getElementById('proposta-card').classList.add('hidden');
+
+  // Montar grid com duplicatas disponíveis agrupadas por time
+  const disp = getDisponivel();
+  const byTeam = {};
+  MINHAS_DUPLICATAS.forEach(d=>{
+    const k = `${d.grp}|${d.team}`;
+    if(!byTeam[k]) byTeam[k]={grp:d.grp,team:d.team,nums:[]};
+    if((disp[`${d.grp}|${d.team}|${d.num}`]||0)>0 && !byTeam[k].nums.includes(d.num)){
+      byTeam[k].nums.push(d.num);
+    }
+  });
+
+  grid.innerHTML = Object.values(byTeam).map(({grp,team,nums})=>{
+    if(!nums.length) return '';
+    const chips = nums.sort((a,b)=>a-b).map(n=>{
+      const esp = isSpecial(team,n);
+      return `<button class="btn sm escolha-chip" id="ec-${team}-${n}" 
+        onclick="toggleEscolha('${grp}','${team}',${n})"
+        style="font-size:11px;padding:4px 8px;border-radius:6px">
+        ${esp?'✨':''}${n}
+      </button>`;
+    }).join('');
+    return `<div style="background:#F8F9FA;border-radius:8px;padding:6px 8px;margin-bottom:4px;min-width:120px">
+      <div style="font-size:10px;font-weight:700;color:#0D1B4B;margin-bottom:4px">G.${grp} ${team}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:3px">${chips}</div>
+    </div>`;
+  }).join('');
+
+  renderSelecionadas();
+}
+
+function toggleEscolha(grp, team, num){
+  const id = `${grp}|${team}|${num}`;
+  const idx = escolhidas.findIndex(e=>e.grp===grp&&e.team===team&&e.num===num);
+  
+  if(idx>-1){
+    // Deselecionar
+    escolhidas.splice(idx,1);
+  } else {
+    // Verificar limite
+    if(escolhidas.length >= maxEscolha){
+      alert(`Você já selecionou o máximo de ${maxEscolha} figurinha(s)!`);
+      return;
+    }
+    escolhidas.push({grp,team,num});
   }
-  resultHtml += `</div>`;
-  content.innerHTML = resultHtml;
 
-  // Salvar reserva no localStorage
-  const nomeEl = document.getElementById('nome-amigo');
-  const nome = nomeEl ? nomeEl.value.trim() || 'Amigo' : 'Amigo';
+  // Atualizar visual do botão
+  const btn = document.getElementById(`ec-${team}-${num}`);
+  if(btn){
+    if(escolhidas.find(e=>e.team===team&&e.num===num)){
+      btn.style.background='#0D1B4B';
+      btn.style.color='#FFB300';
+    } else {
+      btn.style.background='';
+      btn.style.color='';
+    }
+  }
+  renderSelecionadas();
+}
+
+function renderSelecionadas(){
+  const wrap = document.getElementById('escolha-selecionadas');
+  const chips = document.getElementById('sel-chips');
+  const tip = document.getElementById('escolha-tip');
+  
+  tip.textContent = `Escolha até ${maxEscolha} figurinha(s). Selecionadas: ${escolhidas.length}/${maxEscolha}`;
+  
+  if(!escolhidas.length){wrap.classList.add('hidden');return;}
+  wrap.classList.remove('hidden');
+  chips.innerHTML = escolhidas.map(e=>
+    `<span style="background:#E3F2FD;color:#0D1B4B;border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600">
+      ${e.team} #${e.num} ×
+    </span>`
+  ).join('');
+}
+
+function confirmarEscolha(){
+  if(!escolhidas.length){alert('Selecione ao menos 1 figurinha!');return;}
+  
+  const nome = document.getElementById('nome-amigo').value.trim()||'Amigo';
+  
+  // Montar proposta
+  const propostaCard = document.getElementById('proposta-card');
+  const propostaContent = document.getElementById('proposta-content');
+  propostaCard.classList.remove('hidden');
+
+  let html2 = `<div class="result-box"><div class="result-title">🤝 Proposta de troca</div>`;
+  html2 += `<div style="font-size:12px;color:#333;margin:8px 0"><b>📥 Você me dá:</b></div>`;
+  euReceberFigs.forEach(r=>{
+    html2+=`<div class="match-row"><span class="match-get">G.${r.grp} ${r.team} #${r.num}${isSpecial(r.team,r.num)?'✨':''}</span></div>`;
+  });
+  html2 += `<div style="font-size:12px;color:#333;margin:8px 0"><b>📤 Eu te dou:</b></div>`;
+  escolhidas.forEach(e=>{
+    html2+=`<div class="match-row"><span class="match-give">G.${e.grp} ${e.team} #${e.num}${isSpecial(e.team,e.num)?'✨':''}</span></div>`;
+  });
+  html2 += `</div>`;
+  propostaContent.innerHTML = html2;
+
+  // Salvar reserva
   const reservaId = Date.now().toString(36);
-  const reservas = JSON.parse(localStorage.getItem('reservas_copa2026')||'{}');
-  reservas[reservaId] = {
-    nome,
-    ts: Date.now(),
-    items: propostas.filter(p=>p.euDou).map(p=>p.euDou)
-  };
-  localStorage.setItem('reservas_copa2026', JSON.stringify(reservas));
+  try{
+    const reservas = JSON.parse(localStorage.getItem('reservas_copa2026')||'{}');
+    reservas[reservaId]={nome,ts:Date.now(),items:escolhidas};
+    localStorage.setItem('reservas_copa2026',JSON.stringify(reservas));
+  }catch(e){}
 
-  // Montar mensagem WhatsApp
-  const linhas = propostas.map(({euRecebo:r,euDou:d})=>
-    `  • Você me dá: ${r.team} #${r.num} ↔ Eu te dou: ${d?`${d.team} #${d.num}`:'(sem estoque)'}`
-  ).join('\n');
+  // Link mágico
+  const dou = euReceberFigs.map(r=>`${r.team}${r.num}`).join(',');
+  const quero = escolhidas.map(e=>`${e.team}${e.num}`).join(',');
+  const link = `https://fernandowk04.github.io/album2026?reserva=${encodeURIComponent(nome)}&dou=${dou}&quero=${quero}`;
 
-  const msg = `Oi! Vi suas figurinhas no app de trocas do Gabriel & Bernardo 👋
+  const linhasDou = euReceberFigs.map(r=>`  • ${r.team} #${r.num}${isSpecial(r.team,r.num)?' ✨':''}`).join('\n');
+  const linhasQuero = escolhidas.map(e=>`  • ${e.team} #${e.num}${isSpecial(e.team,e.num)?' ✨':''}`).join('\n');
 
-Meu nome: ${nome}
-Código da reserva: #${reservaId}
-
-Tenho interesse em trocar:
-${linhas}
-
-Topas? Me manda mensagem pra combinarmos! ⚽🏆
-
-_Álbum FIFA World Cup 2026 - Panini_`;
-
-  // Gerar link mágico
-  const linkMagico = gerarLinkMagico(
-    nome,
-    euRecebo,
-    propostas.filter(p=>p.euDou).map(p=>p.euDou)
-  );
-
-  const msgCompleta = `Oi! Vi suas figurinhas no app de trocas do Gabriel & Bernardo 👋
+  const msg = `Oi! Quero trocar figurinhas com o Gabriel & Bernardo! 👋
 
 Meu nome: ${nome}
 
-Tenho interesse em trocar:
-${linhas}
+📥 Eu te dou:
+${linhasDou}
 
-👉 Clica aqui para aprovar a reserva:
-${linkMagico}
+📤 Quero de vocês:
+${linhasQuero}
 
-Topas? Me manda mensagem pra combinarmos! ⚽🏆
+👉 Clica aqui para aprovar:
+${link}
 
-_Álbum FIFA World Cup 2026 - Panini_`;
+⚽ Álbum FIFA World Cup 2026 - Panini`;
 
-  document.getElementById('wpp-msg').textContent = msgCompleta;
-  wppWrap.classList.remove('hidden');
+  document.getElementById('wpp-msg').textContent = msg;
+  propostaCard.scrollIntoView({behavior:'smooth'});
 }
 
 function sendWpp(){
